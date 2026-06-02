@@ -1,0 +1,35 @@
+---
+const hardware = [
+  'Arduino Nano', 'Arduino Uno R3', 'ESP32-S3',
+  'PVDF Sensor', 'MPU-6050', 'MQ-135',
+  'Soil Moisture', 'NRF24', 'Op-Amp · ADC',
+  'Relay', 'Breadboard', '3D Printing',
+];
+const software = [
+  'C / C++', 'Embedded C', 'Python',
+  'TensorFlow Lite', 'CNN', 'MobileNet / EfficientNet',
+  'Librosa', 'scikit-learn', 'Grad-CAM',
+  'Edge AI · TinyML', 'Arduino IDE', 'I2C',
+];
+---
+<section class="sec" id="stack">
+  <div class="sec-head reveal"><h2>Tech Stack</h2><div class="line"></div></div>
+  <div class="duo">
+    <div class="card reveal">
+      <div class="pad">
+        <div class="label">// hardware</div>
+        <div class="tech-chips">
+          {hardware.map((t) => <span class="tech">{t}</span>)}
+        </div>
+      </div>
+    </div>
+    <div class="card reveal">
+      <div class="pad">
+        <div class="label">// software</div>
+        <div class="tech-chips">
+          {software.map((t) => <span class="tech">{t}</span>)}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

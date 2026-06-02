@@ -1,0 +1,222 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Projects from '../components/Projects.astro';
+import Stack from '../components/Stack.astro';
+import Footer from '../components/Footer.astro';
+import Modals from '../components/Modals.astro';
+---
+
+<Layout>
+  <Nav />
+  <div class="wrap">
+    <Hero />
+    <About />
+    <Projects />
+    <Stack />
+    <Footer />
+  </div>
+
+  <Modals />
+</Layout>
+
+<script>
+  /* ---------------- STARFIELD ---------------- */
+  (function () {
+    const cv = document.getElementById('stars') as HTMLCanvasElement | null;
+    if (!cv) return;
+    const ctx = cv.getContext('2d')!;
+    let w: number, h: number, dpr: number,
+      stars: { x: number; y: number; r: number; a: number; tw: number; vy: number; vx: number }[] = [],
+      shooters: { x: number; y: number; len: number; life: number; sp: number; ang: number }[] = [];
+    function resize() {
+      dpr = Math.min(devicePixelRatio || 1, 2);
+      w = cv!.width = innerWidth * dpr;
+      h = cv!.height = innerHeight * dpr;
+      cv!.style.width = innerWidth + 'px';
+      cv!.style.height = innerHeight + 'px';
+      const n = Math.round((innerWidth * innerHeight) / 13000);
+      stars = [];
+      for (let i = 0; i < n; i++) {
+        stars.push({
+          x: Math.random() * w, y: Math.random() * h,
+          r: (Math.random() * 1.3 + 0.3) * dpr, a: Math.random(), tw: Math.random() * 0.02 + 0.004,
+          vy: (Math.random() * 0.12 + 0.02) * dpr, vx: (Math.random() * 0.06 - 0.03) * dpr,
+        });
+      }
+    }
+    resize();
+    addEventListener('resize', resize);
+    function spawnShooter() {
+      if (Math.random() < 0 && shooters.length < 2) {
+        const sx = Math.random() * w * 0.7, sy = Math.random() * h * 0.4;
+        shooters.push({ x: sx, y: sy, len: 0, life: 0, sp: (7 + Math.random() * 5) * dpr, ang: Math.PI * 0.18 + Math.random() * 0.1 });
+      }
+    }
+    function frame() {
+      ctx.clearRect(0, 0, w, h);
+      for (const s of stars) {
+        s.a += s.tw;
+        const al = 0.35 + Math.abs(Math.sin(s.a)) * 0.6;
+        s.y += s.vy; s.x += s.vx;
+        if (s.y > h) { s.y = 0; s.x = Math.random() * w; }
+        if (s.x > w) s.x = 0;
+        if (s.x < 0) s.x = w;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, 6.283);
+        ctx.fillStyle = 'rgba(30,30,42,' + (al * 0.3).toFixed(3) + ')';
+        ctx.fill();
+      }
+      spawnShooter();
+      for (let i = shooters.length - 1; i >= 0; i--) {
+        const sh = shooters[i];
+        sh.life++;
+        const dx = Math.cos(sh.ang) * sh.sp, dy = Math.sin(sh.ang) * sh.sp;
+        sh.x += dx; sh.y += dy;
+        const tx = sh.x - dx * 9, ty = sh.y - dy * 9;
+        const g = ctx.createLinearGradient(sh.x, sh.y, tx, ty);
+        g.addColorStop(0, 'rgba(255,255,255,.9)');
+        g.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.strokeStyle = g;
+        ctx.lineWidth = 1.6 * dpr;
+        ctx.beginPath(); ctx.moveTo(sh.x, sh.y); ctx.lineTo(tx, ty); ctx.stroke();
+        if (sh.x > w || sh.y > h || sh.life > 120) shooters.splice(i, 1);
+      }
+      requestAnimationFrame(frame);
+    }
+    frame();
+  })();
+
+  /* ---------------- SCROLL REVEAL ---------------- */
+  (function () {
+    const els = [...document.querySelectorAll('.reveal')];
+    const io = new IntersectionObserver(
+      (es) => {
+        es.forEach((e) => {
+          if (e.isIntersecting) {
+            const target = e.target as HTMLElement;
+            const sibs = [...target.parentElement!.children].filter((c) => c.classList.contains('reveal'));
+            const idx = sibs.indexOf(target);
+            target.style.transitionDelay = Math.max(0, idx) * 0.08 + 's';
+            target.classList.add('in');
+            io.unobserve(target);
+          }
+        });
+      },
+      { threshold: 0.14, rootMargin: '0px 0px -8% 0px' }
+    );
+    els.forEach((el) => io.observe(el));
+  })();
+
+  /* ---------------- CARD SPOTLIGHT ---------------- */
+  document.querySelectorAll<HTMLElement>('.proj').forEach((card) => {
+    card.addEventListener('pointermove', (e) => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', e.clientX - r.left + 'px');
+      card.style.setProperty('--my', e.clientY - r.top + 'px');
+    });
+  });
+
+  /* ---------------- MODAL ---------------- */
+  const modal = document.getElementById('modal')!;
+  const mContent = document.getElementById('modal-content')!;
+  const lb = document.getElementById('lightbox')!;
+  const lbImg = lb.querySelector('img') as HTMLImageElement;
+  let currentCard: HTMLElement | null = null;
+  let animating = false;
+  const EXP_EASE = 'cubic-bezier(.22,.7,.25,1)';
+
+  function showPanel(key: string) {
+    mContent.querySelectorAll('.m-panel').forEach((p) => {
+      p.classList.toggle('active', (p as HTMLElement).dataset.panel === key);
+    });
+  }
+
+  function openModal(key: string, card: HTMLElement | null) {
+    if (animating) return;
+    currentCard = card || null;
+    showPanel(key);
+    modal.classList.remove('closing');
+    modal.classList.add('show');
+    document.body.classList.add('locked');
+    const dlg = modal.querySelector('.dialog') as HTMLElement;
+    dlg.scrollTop = 0;
+    dlg.style.opacity = '1';
+    if (currentCard) {
+      dlg.style.transition = 'none';
+      dlg.style.transformOrigin = 'top left';
+      dlg.style.transform = 'none';
+      const cr = currentCard.getBoundingClientRect();
+      const dr = dlg.getBoundingClientRect();
+      const s = cr.width / dr.width;
+      const tx = cr.left - dr.left, ty = cr.top - dr.top;
+      dlg.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + s + ')';
+      dlg.getBoundingClientRect();
+      animating = true;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          dlg.style.transition = 'transform .62s ' + EXP_EASE;
+          dlg.style.transform = 'none';
+          setTimeout(() => { animating = false; }, 640);
+        });
+      });
+    }
+    const v = mContent.querySelector('.m-panel.active video') as HTMLVideoElement | null;
+    if (v) { v.currentTime = 0; v.play().catch(() => {}); }
+  }
+
+  function closeModal() {
+    if (animating) return;
+    const dlg = modal.querySelector('.dialog') as HTMLElement;
+    const v = mContent.querySelector('.m-panel.active video') as HTMLVideoElement | null;
+    if (v) v.pause();
+    modal.classList.add('closing');
+    const finish = () => {
+      modal.classList.remove('show');
+      modal.classList.remove('closing');
+      document.body.classList.remove('locked');
+      mContent.querySelectorAll('.m-panel').forEach((p) => p.classList.remove('active'));
+      dlg.style.transition = '';
+      dlg.style.transform = '';
+      dlg.style.opacity = '';
+      dlg.style.transformOrigin = '';
+      currentCard = null;
+      animating = false;
+    };
+    if (currentCard) {
+      const cr = currentCard.getBoundingClientRect();
+      const dr = dlg.getBoundingClientRect();
+      const s = cr.width / dr.width;
+      const tx = cr.left - dr.left, ty = cr.top - dr.top;
+      animating = true;
+      dlg.style.transformOrigin = 'top left';
+      dlg.style.transition = 'transform .5s cubic-bezier(.4,0,.5,1), opacity .45s';
+      dlg.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + s + ')';
+      dlg.style.opacity = '0';
+      setTimeout(finish, 500);
+    } else {
+      finish();
+    }
+  }
+
+  document.querySelectorAll<HTMLElement>('.proj').forEach((c) => {
+    c.addEventListener('click', () => openModal(c.dataset.modal!, c));
+  });
+  modal.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', closeModal));
+  addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (lb.classList.contains('show')) closeLb();
+      else if (modal.classList.contains('show')) closeModal();
+    }
+  });
+
+  /* ---------------- LIGHTBOX ---------------- */
+  function closeLb() { lb.classList.remove('show'); }
+  mContent.addEventListener('click', (e) => {
+    const t = (e.target as HTMLElement).closest('[data-zoom]') as HTMLImageElement | null;
+    if (t) { lbImg.src = t.src; lb.classList.add('show'); }
+  });
+  lb.addEventListener('click', closeLb);
+</script>

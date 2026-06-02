@@ -1,0 +1,10 @@
+---
+import { projects } from '../data/projects';
+import ProjectCard from './ProjectCard.astro';
+---
+<section class="sec" id="projects">
+  <div class="sec-head reveal"><h2>Projects</h2><div class="line"></div></div>
+  <div class="grid">
+    {projects.map((project) => <ProjectCard project={project} />)}
+  </div>
+</section>

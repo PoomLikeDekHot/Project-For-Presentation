@@ -1,0 +1,32 @@
+---
+import type { Project } from '../data/projects';
+interface Props { project: Project }
+const { project } = Astro.props;
+---
+<div class="beam reveal">
+  <article class="card proj" data-modal={project.key}>
+    <div class={project.placeholder ? 'banner placeholder' : 'banner'}>
+      {!project.placeholder && project.bannerImg && (
+        <img class="bg-media" src={project.bannerImg} alt="" />
+      )}
+      <div class="scrim"></div>
+      <div class="top-row">
+        <span class="eyebrow-tag">{project.eyebrowTag}</span>
+        {project.hasPlay && (
+          <div class="play">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        )}
+      </div>
+      <div class="pt">{project.title}</div>
+      <div class="pth">{project.subtitle}</div>
+    </div>
+    <div class="proj-body">
+      <p>{project.cardDesc}</p>
+      <div class="tags">
+        {project.cardTags.map((t) => <span class="tag">{t}</span>)}
+      </div>
+      <div class="open-row">{project.openLabel} <span class="arw">→</span></div>
+    </div>
+  </article>
+</div>

@@ -1,0 +1,59 @@
+---
+import { projects } from '../data/projects';
+---
+<!-- ============ MODALS ============ -->
+<div class="modal-root" id="modal">
+  <div class="backdrop" data-close></div>
+  <div class="dialog" role="dialog" aria-modal="true">
+    <button class="m-close" data-close aria-label="ปิด">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <div id="modal-content">
+      {projects.map((d) => (
+        <div class="m-panel" data-panel={d.key}>
+          {d.media.kind === 'video' ? (
+            <div class="m-media">
+              <video src={d.media.src} controls playsinline preload="metadata"></video>
+            </div>
+          ) : (
+            <img class="m-hero-img" src={d.media.src} alt={d.media.alt ?? d.title} />
+          )}
+          <div class="m-body">
+            <div class="m-eyebrow">{d.modalEyebrow}</div>
+            <h2 class="m-title">{d.title}</h2>
+            <div class="m-sub">{d.subtitle}</div>
+            <p class="m-lead">{d.lead}</p>
+
+            {d.gallery && (
+              <>
+                <div class="m-h">ภาพบอร์ดจริง</div>
+                <div class="gallery">
+                  {d.gallery.map((s) => <img src={s} alt="" data-zoom />)}
+                </div>
+              </>
+            )}
+
+            <div class="m-h">หลักการทำงาน</div>
+            <div class="steps">
+              {d.steps.map((s) => (
+                <div class="step"><span class="n"></span><span class="t" set:html={s}></span></div>
+              ))}
+            </div>
+
+            <div class="m-h">อุปกรณ์ที่ใช้</div>
+            <div class="comp-grid">
+              {d.components.map((c) => (
+                <div class="comp">
+                  <div class="cn">{c[0]}{c[1] && <span class="qty">{c[1]}</span>}</div>
+                  <div class="cd">{c[2]}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox"><img src="" alt="" /></div>
