@@ -70,7 +70,7 @@ export const projects: Project[] = [
   {
     key: 'water',
     placeholder: false,
-    bannerImg: '/assets/waterdispenser-intro.jpg',
+    bannerImg: '/assets/waterdispenser-intro.webp',
     eyebrowTag: 'ARDUINO · MINI PROJECT',
     title: 'Auto Water Dispenser',
     subtitle: 'เครื่องกดน้ำอัตโนมัติ',
@@ -81,8 +81,8 @@ export const projects: Project[] = [
 
     modalEyebrow: 'ARDUINO · MINI PROJECT',
     lead: 'เครื่องกดน้ำอัตโนมัติบน Arduino Uno R3 ผู้ใช้กดปริมาณน้ำที่ต้องการผ่าน Keypad ระบบจะปั๊มน้ำพร้อมนับปริมาณจริงด้วย Flow Meter จนครบแล้วหยุดเองและแจ้งเตือน',
-    media: { kind: 'image', src: '/assets/waterdispenser-intro.jpg', alt: 'Auto Water Dispenser' },
-    gallery: ['/assets/build-01.jpg', '/assets/build-02.jpg', '/assets/build-03.jpg'],
+    media: { kind: 'image', src: '/assets/waterdispenser-intro.webp', alt: 'Auto Water Dispenser' },
+    gallery: ['/assets/build-01.webp', '/assets/build-02.webp', '/assets/build-03.webp'],
     steps: [
       '<b>เลือกปริมาณ</b> — ผู้ใช้กดจำนวนน้ำที่ต้องการผ่าน Keypad (Numpad)',
       '<b>แสดงผล</b> — LCD แสดงค่าที่ตั้งไว้และสถานะการทำงาน',
@@ -102,7 +102,7 @@ export const projects: Project[] = [
   {
     key: 'ai',
     placeholder: false,
-    bannerImg: '/assets/lung.jpg',
+    bannerImg: '/assets/lung.webp',
     eyebrowTag: 'EDGE AI · TINYML',
     title: 'AI Lung Sound Classifier',
     subtitle: 'เครื่องฟังเสียงปอดทำนายโรคด้วย AI',
@@ -113,7 +113,7 @@ export const projects: Project[] = [
 
     modalEyebrow: 'EDGE AI · TINYML · DSP',
     lead: 'อุปกรณ์ฟังเสียงปอด (electronic stethoscope) ที่ออกแบบเอง ใช้เซ็นเซอร์ PVDF รับเสียงปอดผ่านวงจรขยาย/กรองสัญญาณ แล้วให้โมเดล AI วิเคราะห์แยกโรคทางเดินหายใจ 4 กลุ่ม (Normal / Crackle / Wheeze / Both) โดยบีบอัดโมเดลให้รันบนชิป ESP32-S3 ได้โดยตรง เพื่อเป็นอุปกรณ์ราคาประหยัดที่ใช้ได้จริงที่บ้าน — งบฮาร์ดแวร์รวม ≈ 1,480–2,380 บาท',
-    media: { kind: 'image', src: '/assets/lung.jpg', alt: 'AI Lung Sound Classifier' },
+    media: { kind: 'image', src: '/assets/lung.webp', alt: 'AI Lung Sound Classifier' },
     steps: [
       '<b>Dataset</b> — เสียงปอด 920 ไฟล์ จาก Respiratory Sound Database (Kaggle) และ HF_Lung_V1 แบ่งเป็น 4 label: Normal, Crackle, Wheeze, Both',
       '<b>Preprocessing</b> — ปรับ Sampling Rate ให้เท่ากัน → ลด Noise (Band-pass filter / spectral gating) → Trim Silence → Normalization',
