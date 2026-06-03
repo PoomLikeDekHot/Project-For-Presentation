@@ -59,11 +59,20 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const path = body.path || '/';
 
   // ── Embed สไตล์ขาวดำ มินิมอลตามธีมเว็บ (พื้นดำ ขอบขาว) ──
+  // รูปภาพ — อ้างจากโดเมนของเว็บเองอัตโนมัติ (ใช้ได้ทุกโดเมน)
+  const origin = new URL(request.url).origin;
+  const avatar = `${origin}/assets/avatar.jpg`;
+  // อยากเปลี่ยนรูปแบนเนอร์ใหญ่ → วางไฟล์ใน public/assets/ แล้วตั้ง env VISITOR_IMAGE_URL
+  const bannerEnv =
+    (locals as any)?.runtime?.env?.VISITOR_IMAGE_URL ?? import.meta.env.VISITOR_IMAGE_URL;
+  const bannerUrl = bannerEnv || avatar;
+
   const embed = {
-    author: { name: 'PHUM · PORTFOLIO' },
+    author: { name: 'PHUM · PORTFOLIO', icon_url: avatar },
     title: '◍  มีผู้เข้าชมเว็บไซต์',
     description: '```\nA new visitor just landed.\n```',
     color: 0xffffff, // ขอบซ้ายสีขาว = โทนขาวดำ
+    thumbnail: { url: avatar }, // รูปเล็กมุมขวาบน
     fields: [
       { name: '› หน้า', value: '`' + path + '`', inline: true },
       { name: '› อุปกรณ์', value: deviceFromUA(ua), inline: true },
@@ -72,7 +81,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
       { name: '› เวลา', value: now + ' น.', inline: true },
       { name: '› ที่มา', value: referrer, inline: false },
     ],
-    footer: { text: 'phum-portfolio · live tracking' },
+    image: { url: bannerUrl }, // รูปใหญ่ด้านล่าง
+    footer: { text: 'phum-portfolio · live tracking', icon_url: avatar },
     timestamp: new Date().toISOString(),
   };
 
@@ -81,6 +91,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
       username: 'Portfolio',
+      avatar_url: avatar, // รูปโปรไฟล์ของบอตที่ส่งข้อความ
       embeds: [embed],
     }),
   });
