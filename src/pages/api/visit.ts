@@ -62,10 +62,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
   // รูปภาพ — อ้างจากโดเมนของเว็บเองอัตโนมัติ (ใช้ได้ทุกโดเมน)
   const origin = new URL(request.url).origin;
   const avatar = `${origin}/assets/avatar.jpg`;
-  // อยากเปลี่ยนรูปแบนเนอร์ใหญ่ → วางไฟล์ใน public/assets/ แล้วตั้ง env VISITOR_IMAGE_URL
+  // รูปแบนเนอร์ใหญ่ (gradient ขาวดำ) — เปลี่ยนได้โดยตั้ง env VISITOR_IMAGE_URL
   const bannerEnv =
     (locals as any)?.runtime?.env?.VISITOR_IMAGE_URL ?? import.meta.env.VISITOR_IMAGE_URL;
-  const bannerUrl = bannerEnv || avatar;
+  const bannerUrl = bannerEnv || `${origin}/assets/visitor-banner.png`;
 
   const embed = {
     author: { name: 'PHUM · PORTFOLIO', icon_url: avatar },
