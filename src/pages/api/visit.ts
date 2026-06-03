@@ -56,6 +56,29 @@ function sourceLabel(ref?: string): string {
   }
 }
 
+// ── debug ชั่วคราว: GET /api/visit?debug=1 ── (โชว์เฉพาะชื่อ env ไม่โชว์ค่า)
+export const GET: APIRoute = async ({ request, locals }) => {
+  const url = new URL(request.url);
+  if (url.searchParams.get('debug') !== '1') {
+    return new Response('ok', { status: 200 });
+  }
+  const runtime = (locals as any)?.runtime;
+  const env = runtime?.env ?? {};
+  return new Response(
+    JSON.stringify(
+      {
+        hasRuntime: !!runtime,
+        envKeys: Object.keys(env), // ชื่อ env ทั้งหมดที่ function มองเห็น
+        hasWebhook: typeof env.DISCORD_WEBHOOK_URL === 'string' && env.DISCORD_WEBHOOK_URL.length > 0,
+        webhookLen: typeof env.DISCORD_WEBHOOK_URL === 'string' ? env.DISCORD_WEBHOOK_URL.length : 0,
+      },
+      null,
+      2,
+    ),
+    { status: 200, headers: { 'content-type': 'application/json' } },
+  );
+};
+
 export const POST: APIRoute = async ({ request, locals }) => {
   const webhookUrl = readEnv(locals, 'DISCORD_WEBHOOK_URL');
   if (!webhookUrl) {
