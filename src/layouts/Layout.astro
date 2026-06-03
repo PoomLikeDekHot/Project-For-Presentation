@@ -29,5 +29,31 @@ const { title = 'ณัฐเศรษฐ สีถาพล · Phum — Portfol
     <div class="vignette"></div>
 
     <slot />
+
+    <!-- แจ้งเตือน Discord เมื่อมีผู้เข้าชม (ยิง 1 ครั้งต่อ session กัน rate limit) -->
+    <script>
+      (() => {
+        try {
+          if (sessionStorage.getItem('visit-pinged')) return;
+          sessionStorage.setItem('visit-pinged', '1');
+        } catch {
+          /* บางเบราว์เซอร์ปิด storage ก็ปล่อยให้ยิงตามปกติ */
+        }
+        const send = () =>
+          fetch('/api/visit', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            keepalive: true,
+            body: JSON.stringify({
+              path: location.pathname,
+              referrer: document.referrer,
+              screen: `${screen.width}x${screen.height}`,
+              language: navigator.language,
+            }),
+          }).catch(() => {});
+        if ('requestIdleCallback' in window) requestIdleCallback(send);
+        else setTimeout(send, 800);
+      })();
+    </script>
   </body>
 </html>
