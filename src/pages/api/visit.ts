@@ -85,9 +85,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   const origin = new URL(request.url).origin;
   const host = new URL(request.url).host;
-  const avatar = `${origin}/assets/avatar.jpg`;
+  const avatar = readEnv(locals, 'VISITOR_AVATAR_URL') || `${origin}/assets/profile.jpg`;
   const bannerUrl =
-    readEnv(locals, 'VISITOR_IMAGE_URL') || `${origin}/assets/visitor-banner.png`;
+    readEnv(locals, 'VISITOR_IMAGE_URL') || `${origin}/assets/luffy.gif`;
 
   // ── ส่วนหัวสไตล์ terminal ด้วย ANSI (Discord รองรับ ```ansi) ──
   const E = '';
