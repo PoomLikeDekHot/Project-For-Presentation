@@ -33,9 +33,12 @@ const { title = 'ณัฐเศรษฐ สีถาพล · Phum — Portfol
     <!-- แจ้งเตือน Discord เมื่อมีผู้เข้าชม (ยิง 1 ครั้งต่อ session กัน rate limit) -->
     <script>
       (() => {
+        let firstVisit = false;
         try {
           if (sessionStorage.getItem('visit-pinged')) return;
           sessionStorage.setItem('visit-pinged', '1');
+          firstVisit = !localStorage.getItem('visited-before');
+          if (firstVisit) localStorage.setItem('visited-before', '1');
         } catch {
           /* บางเบราว์เซอร์ปิด storage ก็ปล่อยให้ยิงตามปกติ */
         }
@@ -49,6 +52,7 @@ const { title = 'ณัฐเศรษฐ สีถาพล · Phum — Portfol
               referrer: document.referrer,
               screen: `${screen.width}x${screen.height}`,
               language: navigator.language,
+              firstVisit,
             }),
           }).catch(() => {});
         if ('requestIdleCallback' in window) requestIdleCallback(send);

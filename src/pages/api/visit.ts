@@ -8,12 +8,12 @@ interface VisitPayload {
   referrer?: string;
   screen?: string;
   language?: string;
+  firstVisit?: boolean;
 }
 
 /** อ่าน env ได้ทั้งบน Cloudflare (locals.runtime.env) และตอน dev (import.meta.env) */
-function readWebhookUrl(locals: App.Locals): string | undefined {
-  const fromRuntime = (locals as any)?.runtime?.env?.DISCORD_WEBHOOK_URL;
-  return fromRuntime ?? import.meta.env.DISCORD_WEBHOOK_URL;
+function readEnv(locals: App.Locals, key: string): string | undefined {
+  return (locals as any)?.runtime?.env?.[key] ?? (import.meta.env as any)[key];
 }
 
 function deviceFromUA(ua: string): string {
@@ -31,8 +31,33 @@ function browserFromUA(ua: string): string {
   return 'อื่นๆ';
 }
 
+/** แปลง referrer ยาวๆ เป็นชื่อแหล่งที่มาแบบอ่านง่าย */
+function sourceLabel(ref?: string): string {
+  if (!ref || !ref.trim()) return 'เข้าตรง';
+  try {
+    const h = new URL(ref).hostname.replace(/^www\./, '').toLowerCase();
+    const map: [RegExp, string][] = [
+      [/google\./, 'Google'],
+      [/(facebook\.|fb\.)/, 'Facebook'],
+      [/instagram\./, 'Instagram'],
+      [/(t\.co|twitter\.|x\.com)/, 'X'],
+      [/linkedin\./, 'LinkedIn'],
+      [/youtube\.|youtu\.be/, 'YouTube'],
+      [/tiktok\./, 'TikTok'],
+      [/github\./, 'GitHub'],
+      [/bing\./, 'Bing'],
+      [/reddit\./, 'Reddit'],
+      [/(line\.me|liff)/, 'LINE'],
+    ];
+    for (const [re, name] of map) if (re.test(h)) return name;
+    return h;
+  } catch {
+    return 'เข้าตรง';
+  }
+}
+
 export const POST: APIRoute = async ({ request, locals }) => {
-  const webhookUrl = readWebhookUrl(locals);
+  const webhookUrl = readEnv(locals, 'DISCORD_WEBHOOK_URL');
   if (!webhookUrl) {
     return new Response(JSON.stringify({ ok: false, error: 'no webhook configured' }), {
       status: 200,
@@ -49,40 +74,46 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   const ua = request.headers.get('user-agent') ?? '';
   const country = request.headers.get('cf-ipcountry') ?? '—';
-  const now = new Date().toLocaleString('th-TH', {
-    timeZone: 'Asia/Bangkok',
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
-
-  const referrer = body.referrer && body.referrer.trim() !== '' ? body.referrer : 'เข้าตรง (ไม่มีที่มา)';
   const path = body.path || '/';
+  const isFirst = body.firstVisit === true;
 
-  // ── Embed สไตล์ขาวดำ มินิมอลตามธีมเว็บ (พื้นดำ ขอบขาว) ──
-  // รูปภาพ — อ้างจากโดเมนของเว็บเองอัตโนมัติ (ใช้ได้ทุกโดเมน)
+  const fmt = (opt: Intl.DateTimeFormatOptions) =>
+    new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok', ...opt });
+  const time = fmt({ hour: '2-digit', minute: '2-digit' });
+  const date = fmt({ day: 'numeric', month: 'short', year: 'numeric' });
+
   const origin = new URL(request.url).origin;
+  const host = new URL(request.url).host;
   const avatar = `${origin}/assets/avatar.jpg`;
-  // รูปแบนเนอร์ใหญ่ (gradient ขาวดำ) — เปลี่ยนได้โดยตั้ง env VISITOR_IMAGE_URL
-  const bannerEnv =
-    (locals as any)?.runtime?.env?.VISITOR_IMAGE_URL ?? import.meta.env.VISITOR_IMAGE_URL;
-  const bannerUrl = bannerEnv || `${origin}/assets/visitor-banner.png`;
+  const bannerUrl =
+    readEnv(locals, 'VISITOR_IMAGE_URL') || `${origin}/assets/visitor-banner.png`;
+
+  // ── ส่วนหัวสไตล์ terminal ด้วย ANSI (Discord รองรับ ```ansi) ──
+  const E = '';
+  const W = `${E}[1;37m`; // ขาวเข้ม (bold)
+  const D = `${E}[1;30m`; // เทา
+  const R = `${E}[0m`; // reset
+  const head = isFirst ? 'NEW VISITOR' : 'RETURNING VISITOR';
+  const description =
+    '```ansi\n' +
+    `${W}${head}${R}\n` +
+    `${D}${'─'.repeat(24)}${R}\n` +
+    `${W}${path}${R} ${D}· ${host}${R}\n` +
+    '```';
 
   const embed = {
-    author: { name: 'PHUM · PORTFOLIO', icon_url: avatar },
-    title: '◍  มีผู้เข้าชมเว็บไซต์',
-    description: '```\nA new visitor just landed.\n```',
-    color: 0xffffff, // ขอบซ้ายสีขาว = โทนขาวดำ
-    thumbnail: { url: avatar }, // รูปเล็กมุมขวาบน
+    author: { name: `● ${host}`, icon_url: avatar },
+    description,
+    color: 0xffffff, // ขอบซ้ายขาว = โทนขาวดำ
+    thumbnail: { url: avatar },
     fields: [
-      { name: '› หน้า', value: '`' + path + '`', inline: true },
-      { name: '› อุปกรณ์', value: deviceFromUA(ua), inline: true },
-      { name: '› เบราว์เซอร์', value: browserFromUA(ua), inline: true },
-      { name: '› ประเทศ', value: country, inline: true },
-      { name: '› เวลา', value: now + ' น.', inline: true },
-      { name: '› ที่มา', value: referrer, inline: false },
+      { name: 'location', value: country, inline: true },
+      { name: 'device', value: `${deviceFromUA(ua)} · ${browserFromUA(ua)}`, inline: true },
+      { name: 'source', value: sourceLabel(body.referrer), inline: true },
+      { name: 'local time', value: `${time} น. · ${date}`, inline: false },
     ],
-    image: { url: bannerUrl }, // รูปใหญ่ด้านล่าง
-    footer: { text: 'phum-portfolio · live tracking', icon_url: avatar },
+    image: { url: bannerUrl },
+    footer: { text: host },
     timestamp: new Date().toISOString(),
   };
 
@@ -90,8 +121,8 @@ export const POST: APIRoute = async ({ request, locals }) => {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
-      username: 'Portfolio',
-      avatar_url: avatar, // รูปโปรไฟล์ของบอตที่ส่งข้อความ
+      username: host,
+      avatar_url: avatar,
       embeds: [embed],
     }),
   });
