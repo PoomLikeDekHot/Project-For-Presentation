@@ -1,0 +1,6 @@
+# Cache สำหรับไฟล์ static ที่ไม่เปลี่ยน (รูป/ฟอนต์/asset ที่ hash ชื่อ)
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

@@ -13,10 +13,10 @@ import { projects } from '../data/projects';
         <div class="m-panel" data-panel={d.key}>
           {d.media.kind === 'video' ? (
             <div class="m-media">
-              <video src={d.media.src} controls playsinline preload="metadata"></video>
+              <video src={d.media.src} controls playsinline preload="none"></video>
             </div>
           ) : (
-            <img class="m-hero-img" src={d.media.src} alt={d.media.alt ?? d.title} />
+            <img class="m-hero-img" src={d.media.src} alt={d.media.alt ?? d.title} loading="lazy" decoding="async" />
           )}
           <div class="m-body">
             <div class="m-eyebrow">{d.modalEyebrow}</div>
@@ -28,7 +28,7 @@ import { projects } from '../data/projects';
               <>
                 <div class="m-h">ภาพบอร์ดจริง</div>
                 <div class="gallery">
-                  {d.gallery.map((s) => <img src={s} alt="" data-zoom />)}
+                  {d.gallery.map((s) => <img src={s} alt="" data-zoom loading="lazy" decoding="async" />)}
                 </div>
               </>
             )}

@@ -7,7 +7,7 @@ const { project } = Astro.props;
   <article class="card proj" data-modal={project.key}>
     <div class={project.placeholder ? 'banner placeholder' : 'banner'}>
       {!project.placeholder && project.bannerImg && (
-        <img class="bg-media" src={project.bannerImg} alt="" />
+        <img class="bg-media" src={project.bannerImg} alt="" loading="lazy" decoding="async" />
       )}
       <div class="scrim"></div>
       <div class="top-row">

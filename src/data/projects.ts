@@ -70,7 +70,7 @@ export const projects: Project[] = [
   {
     key: 'water',
     placeholder: false,
-    bannerImg: '/assets/waterdispenser-intro.png',
+    bannerImg: '/assets/waterdispenser-intro.jpg',
     eyebrowTag: 'ARDUINO · MINI PROJECT',
     title: 'Auto Water Dispenser',
     subtitle: 'เครื่องกดน้ำอัตโนมัติ',
@@ -81,7 +81,7 @@ export const projects: Project[] = [
 
     modalEyebrow: 'ARDUINO · MINI PROJECT',
     lead: 'เครื่องกดน้ำอัตโนมัติบน Arduino Uno R3 ผู้ใช้กดปริมาณน้ำที่ต้องการผ่าน Keypad ระบบจะปั๊มน้ำพร้อมนับปริมาณจริงด้วย Flow Meter จนครบแล้วหยุดเองและแจ้งเตือน',
-    media: { kind: 'image', src: '/assets/waterdispenser-intro.png', alt: 'Auto Water Dispenser' },
+    media: { kind: 'image', src: '/assets/waterdispenser-intro.jpg', alt: 'Auto Water Dispenser' },
     gallery: ['/assets/build-01.jpg', '/assets/build-02.jpg', '/assets/build-03.jpg'],
     steps: [
       '<b>เลือกปริมาณ</b> — ผู้ใช้กดจำนวนน้ำที่ต้องการผ่าน Keypad (Numpad)',
