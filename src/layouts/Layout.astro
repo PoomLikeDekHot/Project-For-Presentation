@@ -11,6 +11,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://natthaseth.
 const ogImage = new URL('/assets/avatar.jpg', Astro.site ?? 'https://natthaseth.online');
 const fontHref =
   'https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap';
+
+// SEO / Analytics — ตั้งค่าจริงใน Cloudflare Pages > Settings > Environment variables
+// PUBLIC_GA_ID            = Measurement ID ของ GA4 เช่น G-XXXXXXXXXX
+// PUBLIC_GSC_VERIFICATION = โค้ดจาก Google Search Console (แบบ HTML tag) เฉพาะค่า content
+const GA_ID = import.meta.env.PUBLIC_GA_ID;
+const GSC_VERIFICATION = import.meta.env.PUBLIC_GSC_VERIFICATION;
 ---
 
 <!DOCTYPE html>
@@ -24,6 +30,7 @@ const fontHref =
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#050505" />
     <link rel="canonical" href={canonical} />
+    {GSC_VERIFICATION && <meta name="google-site-verification" content={GSC_VERIFICATION} />}
 
     <!-- Open Graph / Twitter -->
     <meta property="og:type" content="website" />
@@ -42,6 +49,21 @@ const fontHref =
     <link rel="preload" as="style" href={fontHref} />
     <link rel="stylesheet" href={fontHref} media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href={fontHref} /></noscript>
+
+    <!-- Google Analytics 4 (gtag.js) — โหลดเฉพาะเมื่อมีการตั้งค่า PUBLIC_GA_ID -->
+    {
+      GA_ID && (
+        <Fragment>
+          <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
+          <script is:inline define:vars={{ GA_ID }}>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){ dataLayer.push(arguments); }
+            gtag('js', new Date());
+            gtag('config', GA_ID);
+          </script>
+        </Fragment>
+      )
+    }
   </head>
   <body>
     <!-- BACKDROP -->
