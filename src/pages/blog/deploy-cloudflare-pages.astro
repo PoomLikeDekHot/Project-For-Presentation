@@ -1,0 +1,276 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+
+export const prerender = true;
+
+const title = 'การ Deploy โปรเจค โดยใช้ Cloudflare Pages · Phum Blog';
+const checklist = [
+  'มี GitHub repository และ push โค้ดขึ้น branch หลักแล้ว',
+  'รัน npm install และ npm run build ผ่านบนเครื่องตัวเอง',
+  'รู้ build command และ output directory ของโปรเจค',
+  'เตรียม environment variables / secrets ที่ต้องใช้',
+  'มี Cloudflare account และสิทธิ์เชื่อมต่อ GitHub repo',
+];
+---
+
+<Layout title={title}>
+  <Nav />
+  <main class="article-shell">
+    <div class="read-progress" aria-hidden="true"><span data-read-progress></span></div>
+
+    <article class="medium-article">
+      <header class="article-hero reveal">
+        <a class="back-link" href="/">← กลับหน้า Portfolio</a>
+        <p class="article-kicker">Deployment Guide</p>
+        <h1>การ Deploy โปรเจค โดยใช้ Cloudflare Pages</h1>
+        <p class="article-subtitle">
+          คู่มือแบบลงมือทำจริงสำหรับเอาโปรเจคเว็บขึ้นออนไลน์ด้วย GitHub และ Cloudflare Pages
+          ตั้งแต่เตรียมโค้ดจนได้ URL ที่เปิดใช้งานได้ทันที
+        </p>
+        <div class="article-byline">
+          <img src="/assets/avatar.webp" alt="ณัฐเศรษฐ สีถาพล" width="96" height="96" decoding="async" />
+          <div>
+            <strong>ณัฐเศรษฐ สีถาพล</strong>
+            <span>อัปเดต 9 มิถุนายน 2026 · อ่านประมาณ 10 นาที</span>
+          </div>
+        </div>
+        <figure class="article-cover">
+          <img src="/assets/deploy-cloudflare-cartoon.svg" alt="ภาพประกอบการ deploy โปรเจคขึ้น Cloudflare Pages" decoding="async" />
+        </figure>
+      </header>
+
+      <div class="article-layout">
+        <aside class="article-toc reveal" aria-label="สารบัญ">
+          <p>On this page</p>
+          <a href="#overview">ภาพรวม</a>
+          <a href="#prepare">เตรียมโปรเจค</a>
+          <a href="#cloudflare">ตั้งค่า Cloudflare Pages</a>
+          <a href="#env">Environment variables</a>
+          <a href="#preview">Preview และ Production</a>
+          <a href="#troubleshoot">แก้ปัญหาที่เจอบ่อย</a>
+        </aside>
+
+        <div class="article-content">
+          <section id="overview" class="reveal">
+            <p class="lead">
+              Cloudflare Pages คือบริการ deploy เว็บจาก GitHub/GitLab ที่เหมาะกับ static site และ frontend framework
+              เพราะทุกครั้งที่เรา push โค้ดขึ้น branch ที่ตั้งไว้ Cloudflare จะ build และ deploy ให้โดยอัตโนมัติ
+              แถมยังมี preview URL สำหรับ branch หรือ pull request ก่อนปล่อยขึ้น production
+            </p>
+            <p>
+              โปรเจคนี้ใช้ Astro และมี Cloudflare adapter อยู่แล้ว ดังนั้น workflow ที่แนะนำคือให้ GitHub เป็นแหล่งโค้ดหลัก
+              แล้วให้ Cloudflare Pages ดึง repo ไป build ด้วยคำสั่งของโปรเจคโดยตรง วิธีนี้เหมาะกับ portfolio, landing page,
+              blog, dashboard frontend หรือเว็บที่มี API endpoint เล็ก ๆ ผ่าน Pages Functions
+            </p>
+          </section>
+
+          <section class="deploy-snapshot reveal" aria-label="ค่าที่แนะนำสำหรับโปรเจคนี้">
+            <div>
+              <span>Framework</span>
+              <strong>Astro</strong>
+            </div>
+            <div>
+              <span>Build command</span>
+              <strong>npm run build</strong>
+            </div>
+            <div>
+              <span>Output directory</span>
+              <strong>dist</strong>
+            </div>
+          </section>
+
+          <section id="prepare" class="reveal">
+            <h2>1. เตรียมโปรเจคก่อนขึ้น Cloudflare Pages</h2>
+            <p>
+              ก่อนกด deploy ให้เช็คบนเครื่องตัวเองก่อนว่าโปรเจค build ผ่านจริง เพราะ Cloudflare จะทำงานคล้ายเครื่อง build
+              อีกเครื่องหนึ่ง ถ้าในเครื่องเรายัง build ไม่ผ่าน บน Cloudflare ก็มักจะ fail ด้วยเช่นกัน
+            </p>
+
+            <div class="checklist" data-checklist>
+              {checklist.map((item) => (
+                <label>
+                  <input type="checkbox" />
+                  <span>{item}</span>
+                </label>
+              ))}
+            </div>
+
+            <div class="code-card">
+              <button type="button" data-copy="npm install&#10;npm run build">Copy</button>
+              <pre><code>npm install
+npm run build</code></pre>
+            </div>
+
+            <p>
+              สำหรับ Astro ปกติผลลัพธ์หลัง build จะอยู่ในโฟลเดอร์ <code>dist</code> ส่วนโปรเจคนี้มี
+              <code>@astrojs/cloudflare</code> อยู่ใน dependencies แล้ว จึงพร้อมสำหรับ Pages/Workers runtime
+              ถ้าเป็นโปรเจค static ล้วนก็ยังใช้ output directory เป็น <code>dist</code> ได้เหมือนกัน
+            </p>
+          </section>
+
+          <section id="cloudflare" class="reveal">
+            <h2>2. สร้าง Pages project และเชื่อม GitHub</h2>
+            <p>
+              เข้า Cloudflare Dashboard แล้วไปที่ <strong>Workers &amp; Pages</strong> จากนั้นเลือก
+              <strong>Create application</strong> แล้วเลือก <strong>Pages</strong> และ <strong>Connect to Git</strong>
+              ถ้าเป็นครั้งแรก Cloudflare จะให้ติดตั้ง GitHub App เพื่อขอสิทธิ์เข้าถึง repository
+            </p>
+
+            <ol>
+              <li>เลือก GitHub account หรือ organization ที่มี repo ของเรา</li>
+              <li>เลือก repository ที่ต้องการ deploy เช่น <code>Project-For-Presentation</code></li>
+              <li>เลือก production branch เช่น <code>main</code></li>
+              <li>ตั้ง Framework preset เป็น <code>Astro</code> หรือเลือก None แล้วกรอกเอง</li>
+              <li>ตั้ง Build command เป็น <code>npm run build</code></li>
+              <li>ตั้ง Build output directory เป็น <code>dist</code></li>
+              <li>กด Save and Deploy แล้วรอ build แรกจนเสร็จ</li>
+            </ol>
+
+            <div class="callout">
+              <strong>ถ้า repo เป็น monorepo</strong>
+              <p>
+                ให้ตั้ง Root directory ให้ตรงกับโฟลเดอร์ที่มี <code>package.json</code> ของเว็บ
+                เช่น <code>apps/portfolio</code> ไม่อย่างนั้น Cloudflare อาจหา script build ไม่เจอ
+              </p>
+            </div>
+          </section>
+
+          <section id="env" class="reveal">
+            <h2>3. ตั้งค่า Environment Variables และ Secrets</h2>
+            <p>
+              ถ้าเว็บมีค่าที่ไม่ควรเขียนลงโค้ด เช่น webhook URL, token, API key หรือ Measurement ID
+              ให้ตั้งใน Cloudflare Pages แทน โดยเข้า Pages project แล้วไปที่
+              <strong>Settings → Variables and Secrets</strong> จากนั้นเพิ่ม key/value ที่ต้องใช้
+            </p>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>ตัวแปร</th>
+                  <th>ใช้ทำอะไร</th>
+                  <th>แนะนำ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>PUBLIC_GA_ID</code></td>
+                  <td>Google Analytics 4</td>
+                  <td>ใส่เป็น variable ธรรมดาได้</td>
+                </tr>
+                <tr>
+                  <td><code>PUBLIC_GSC_VERIFICATION</code></td>
+                  <td>Google Search Console verification</td>
+                  <td>ใส่เป็น variable ธรรมดาได้</td>
+                </tr>
+                <tr>
+                  <td><code>DISCORD_WEBHOOK_URL</code></td>
+                  <td>ส่งแจ้งเตือนผู้เข้าชมผ่าน API</td>
+                  <td>ควรตั้งเป็น secret</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <p>
+              หลังเพิ่มตัวแปรแล้วให้ redeploy หนึ่งครั้ง เพราะค่าที่ใช้ตอน build หรือ runtime จะถูกผูกกับ deployment
+              ถ้าเปลี่ยนค่าแล้วหน้าเว็บยังเหมือนเดิม ให้ไปที่ Deployments แล้วกด Retry deployment
+            </p>
+          </section>
+
+          <section id="preview" class="reveal">
+            <h2>4. ใช้ Preview Deployments ให้เป็น</h2>
+            <p>
+              จุดที่ทำให้ Cloudflare Pages ใช้งานสนุกคือ preview deployment: เมื่อเปิด pull request หรือ push branch
+              ที่เปิด preview ไว้ Cloudflare จะสร้าง URL แยกให้ทดสอบก่อน merge เข้า production branch
+              ทำให้ลอง UI, modal, animation หรือบทความใหม่ได้โดยไม่กระทบเว็บจริง
+            </p>
+
+            <div class="timeline">
+              <div><span>01</span><p>สร้าง branch ใหม่ เช่น <code>feature/blog-deploy-guide</code></p></div>
+              <div><span>02</span><p>push branch แล้วเปิด pull request บน GitHub</p></div>
+              <div><span>03</span><p>รอ Cloudflare Pages สร้าง preview URL และ status check</p></div>
+              <div><span>04</span><p>ตรวจหน้าเว็บจริงบน preview แล้วค่อย merge เข้า <code>main</code></p></div>
+            </div>
+          </section>
+
+          <section id="troubleshoot" class="reveal">
+            <h2>5. ปัญหาที่เจอบ่อยและวิธีแก้</h2>
+            <h3>Build failed เพราะหา command ไม่เจอ</h3>
+            <p>
+              เช็คว่า Cloudflare อยู่ถูก root directory และใน <code>package.json</code> มี script
+              <code>"build": "astro build"</code> หรือไม่ ถ้าใช้ npm ให้ build command เป็น <code>npm run build</code>
+            </p>
+
+            <h3>Deploy สำเร็จแต่หน้าเว็บ 404</h3>
+            <p>
+              เช็ค output directory ว่าเป็น <code>dist</code> และ build log มีการสร้างไฟล์ในโฟลเดอร์นั้นจริง
+              ถ้าใช้ Astro adapter แบบ server output ให้ตรวจว่า adapter/config ตรงกับ runtime ที่ deploy
+            </p>
+
+            <h3>Environment variables ไม่ทำงาน</h3>
+            <p>
+              ตรวจชื่อ key ให้ตรงทั้งตัวพิมพ์เล็ก/ใหญ่ และดูว่าใส่ไว้ใน production หรือ preview environment ถูกฝั่งหรือไม่
+              ถ้าเป็นค่าลับให้ใช้ Secret และอย่า commit ไฟล์ <code>.env</code> ขึ้น GitHub
+            </p>
+
+            <h3>อยากหยุด deploy ชั่วคราว</h3>
+            <p>
+              เข้า Pages project แล้วไปที่ <strong>Settings → Builds → Branch control</strong>
+              เพื่อปิด automatic deployment ของ production หรือ preview branch ได้
+            </p>
+          </section>
+
+          <section class="source-note reveal">
+            <h2>แหล่งอ้างอิงหลัก</h2>
+            <p>
+              บทความนี้อิงจากเอกสารทางการของ Cloudflare Pages เรื่อง Git integration, GitHub integration,
+              Astro framework guide และ Variables/Secrets เพื่อให้ขั้นตอนตรงกับ workflow ปัจจุบัน
+            </p>
+            <div class="source-links">
+              <a href="https://developers.cloudflare.com/pages/configuration/git-integration/" target="_blank" rel="noreferrer">Cloudflare Pages Git integration</a>
+              <a href="https://developers.cloudflare.com/pages/configuration/git-integration/github-integration/" target="_blank" rel="noreferrer">GitHub integration</a>
+              <a href="https://developers.cloudflare.com/workers/framework-guides/web-apps/astro/" target="_blank" rel="noreferrer">Astro on Cloudflare</a>
+              <a href="https://developers.cloudflare.com/pages/functions/bindings/" target="_blank" rel="noreferrer">Variables and Secrets</a>
+            </div>
+          </section>
+        </div>
+      </div>
+    </article>
+
+    <Footer />
+  </main>
+</Layout>
+
+<script>
+  (() => {
+    const bar = document.querySelector<HTMLElement>('[data-read-progress]');
+    const article = document.querySelector<HTMLElement>('.medium-article');
+    if (!bar || !article) return;
+
+    const setProgress = () => {
+      const rect = article.getBoundingClientRect();
+      const total = rect.height - innerHeight;
+      const read = Math.min(Math.max(-rect.top, 0), Math.max(total, 1));
+      bar.style.transform = `scaleX(${read / Math.max(total, 1)})`;
+    };
+    setProgress();
+    addEventListener('scroll', setProgress, { passive: true });
+    addEventListener('resize', setProgress);
+
+    document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const value = button.dataset.copy || '';
+        try {
+          await navigator.clipboard.writeText(value);
+          button.textContent = 'Copied';
+          window.setTimeout(() => {
+            button.textContent = 'Copy';
+          }, 1400);
+        } catch {
+          button.textContent = 'Select';
+        }
+      });
+    });
+  })();
+</script>

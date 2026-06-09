@@ -1,0 +1,58 @@
+---
+---
+<aside class="announce" data-announce hidden role="dialog" aria-live="polite" aria-label="ประกาศจากเว็บไซต์">
+  <div class="announce-panel">
+    <div class="announce-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 13.5V8.8c0-.9.7-1.6 1.6-1.6h2.8l7-3.2v15.8l-7-3.2H5.6c-.9 0-1.6-.7-1.6-1.6v-1.5Z" />
+        <path d="M8.4 16.6 10 21" />
+        <path d="M19 9.4c.7.6 1 1.5 1 2.6s-.3 2-1 2.6" />
+      </svg>
+    </div>
+    <div class="announce-copy">
+      <p class="announce-kicker">New update</p>
+      <h2>มีบทความใหม่: Deploy โปรเจคด้วย Cloudflare Pages</h2>
+      <p>อ่านเป็นขั้นตอน ตั้งแต่เตรียม repo, ตั้งค่า build, ใส่ environment variables ไปจนถึงแก้ error ตอน deploy</p>
+    </div>
+    <div class="announce-actions">
+      <a class="announce-link" href="/blog/deploy-cloudflare-pages/">อ่านบทความ</a>
+      <button class="announce-close" type="button" data-announce-close aria-label="ปิดประกาศ">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<script>
+  (() => {
+    const root = document.querySelector<HTMLElement>('[data-announce]');
+    const close = root?.querySelector<HTMLButtonElement>('[data-announce-close]');
+    if (!root || !close) return;
+
+    let dismissed = false;
+    try {
+      dismissed = sessionStorage.getItem('announcement-dismissed') === '1';
+    } catch {
+      dismissed = false;
+    }
+
+    if (!dismissed) {
+      window.setTimeout(() => {
+        root.hidden = false;
+        requestAnimationFrame(() => root.classList.add('show'));
+      }, 700);
+    }
+
+    close.addEventListener('click', () => {
+      try {
+        sessionStorage.setItem('announcement-dismissed', '1');
+      } catch {}
+      root.classList.remove('show');
+      window.setTimeout(() => {
+        root.hidden = true;
+      }, 420);
+    });
+  })();
+</script>

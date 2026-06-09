@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Cartoon deployment workstation</title>
+  <desc id="desc">A friendly cartoon-style developer desk with a cloud, code window, rocket, and connected deployment nodes.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#101114"/>
+      <stop offset=".52" stop-color="#15191f"/>
+      <stop offset="1" stop-color="#08090b"/>
+    </linearGradient>
+    <linearGradient id="cloud" x1="0" x2="1">
+      <stop offset="0" stop-color="#f6b15f"/>
+      <stop offset="1" stop-color="#ffd48a"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#242936"/>
+      <stop offset="1" stop-color="#0b0d12"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="24" stdDeviation="24" flood-color="#000" flood-opacity=".45"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="720" rx="42" fill="url(#sky)"/>
+  <path d="M78 552c190-78 343-74 459 12 128 95 297 80 585-56v212H78Z" fill="#0c0d11" opacity=".72"/>
+  <g opacity=".28" stroke="#fff" stroke-width="2">
+    <path d="M108 116h986M108 196h986M108 276h986M108 356h986M108 436h986"/>
+    <path d="M182 76v468M330 76v468M478 76v468M626 76v468M774 76v468M922 76v468"/>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="261" y="228" width="678" height="344" rx="32" fill="#0f1117" stroke="#ffffff" stroke-opacity=".13" stroke-width="3"/>
+    <rect x="289" y="262" width="622" height="252" rx="22" fill="url(#screen)" stroke="#ffffff" stroke-opacity=".12"/>
+    <circle cx="323" cy="294" r="8" fill="#ff6d6d"/>
+    <circle cx="349" cy="294" r="8" fill="#ffcf70"/>
+    <circle cx="375" cy="294" r="8" fill="#58f7c1"/>
+    <path d="M339 358h130M339 405h206M339 452h154" stroke="#58f7c1" stroke-width="18" stroke-linecap="round"/>
+    <path d="M598 358h238M598 405h170M598 452h218" stroke="#77a7ff" stroke-width="18" stroke-linecap="round"/>
+    <path d="M268 572h664l60 62H208Z" fill="#191d25" stroke="#ffffff" stroke-opacity=".12" stroke-width="3"/>
+    <path d="M496 594h208l24 21H472Z" fill="#0c0d12" opacity=".8"/>
+  </g>
+  <g filter="url(#shadow)">
+    <path d="M820 178c-8-51-52-90-105-90-43 0-80 25-97 62-13-11-30-18-49-18-42 0-77 34-77 77 0 4 0 8 1 12-42 7-74 43-74 87 0 49 40 89 89 89h312c61 0 110-49 110-110 0-58-45-106-110-109Z" fill="url(#cloud)" stroke="#fff" stroke-opacity=".32" stroke-width="5"/>
+    <path d="M575 289h224" stroke="#5b390c" stroke-opacity=".38" stroke-width="16" stroke-linecap="round"/>
+    <path d="M617 249h132" stroke="#5b390c" stroke-opacity=".28" stroke-width="16" stroke-linecap="round"/>
+  </g>
+  <g filter="url(#shadow)">
+    <path d="M880 409c54-72 95-90 132-95-4 38-21 83-78 140l-54-45Z" fill="#f9fafb"/>
+    <path d="M930 354c16 2 31 8 44 20" stroke="#ff8f4e" stroke-width="16" stroke-linecap="round"/>
+    <path d="M853 432l48-50 61 55-48 50Z" fill="#77a7ff" stroke="#fff" stroke-opacity=".28" stroke-width="4"/>
+    <path d="M845 454c-36 6-64 22-85 49 31 4 61-2 91-18Z" fill="#ffcf70"/>
+    <path d="M873 485c-18 18-25 40-22 67 25-9 43-24 53-47Z" fill="#58f7c1"/>
+  </g>
+  <g stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M266 180c-55 22-91 59-108 111" stroke="#58f7c1" stroke-width="8"/>
+    <path d="M158 291c37-10 72-6 105 12" stroke="#58f7c1" stroke-width="8"/>
+    <path d="M984 185c46 17 78 48 98 93" stroke="#77a7ff" stroke-width="8"/>
+    <path d="M1082 278c-29-8-58-5-87 9" stroke="#77a7ff" stroke-width="8"/>
+  </g>
+  <g filter="url(#shadow)">
+    <circle cx="184" cy="414" r="42" fill="#151922" stroke="#fff" stroke-opacity=".15" stroke-width="4"/>
+    <circle cx="1018" cy="525" r="42" fill="#151922" stroke="#fff" stroke-opacity=".15" stroke-width="4"/>
+    <circle cx="184" cy="414" r="16" fill="#58f7c1"/>
+    <circle cx="1018" cy="525" r="16" fill="#ffcf70"/>
+    <path d="M226 414h108M916 525h60" stroke="#ffffff" stroke-opacity=".26" stroke-width="7" stroke-dasharray="14 16"/>
+  </g>
+</svg>

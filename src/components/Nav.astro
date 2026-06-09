@@ -1,12 +1,14 @@
 ---
+const isHome = Astro.url.pathname === '/';
 ---
 <nav>
   <div class="nav-in">
     <div class="brand"><span class="mk">ภ</span><span>Phum · ณัฐเศรษฐ</span></div>
     <div class="nav-links">
-      <a href="#about">About</a>
-      <a href="#projects">Projects</a>
-      <a href="#stack">Stack</a>
+      <a href={isHome ? '#about' : '/#about'}>About</a>
+      <a href={isHome ? '#projects' : '/#projects'}>Projects</a>
+      <a href={isHome ? '#stack' : '/#stack'}>Stack</a>
+      <a href="/blog/deploy-cloudflare-pages/">Blog</a>
       <a href="mailto:poom5851@gmail.com">Contact</a>
     </div>
   </div>
