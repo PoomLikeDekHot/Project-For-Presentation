@@ -117,7 +117,7 @@ nav{position:sticky; top:0; z-index:30; backdrop-filter:blur(12px);
 }
 
 /* ---------- SECTION HEAD ---------- */
-.sec{margin-top:84px}
+.sec{margin-top:84px; scroll-margin-top:92px}
 .sec-head{display:flex; align-items:baseline; gap:14px; margin-bottom:26px}
 .sec-head h2{font-size:13px; font-family:var(--mono); letter-spacing:3px; text-transform:uppercase; color:var(--faint); font-weight:500}
 .sec-head .line{flex:1; height:1px; background:var(--line)}
@@ -187,10 +187,22 @@ nav{position:sticky; top:0; z-index:30; backdrop-filter:blur(12px);
 .proj:hover .open-row .arw{transform:translateX(4px)}
 
 /* ---------- TECH ---------- */
-.tech-chips{display:flex; flex-wrap:wrap; gap:10px}
-.tech{font-family:var(--mono); font-size:13px; color:var(--text); background:var(--panel-2);
-  border:1px solid var(--line); padding:9px 15px; border-radius:10px; transition:.2s; letter-spacing:.3px}
-.tech:hover{border-color:var(--line-2); transform:translateY(-2px); color:var(--white)}
+.stack-panels{display:grid; grid-template-columns:1fr 1fr; gap:20px}
+.skill-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.skill-tile{min-height:126px; display:flex; flex-direction:column; gap:13px; padding:15px;
+  border:1px solid var(--line); border-radius:14px; background:rgba(255,255,255,.035);
+  transition:transform .24s cubic-bezier(.2,.7,.2,1), border-color .24s, background .24s}
+.skill-tile:hover{transform:translateY(-3px); border-color:var(--line-2); background:rgba(255,255,255,.058)}
+.skill-icon{width:42px;height:42px;border-radius:13px; display:grid; place-items:center; color:var(--accent);
+  background:rgba(88,247,193,.09); border:1px solid rgba(88,247,193,.2)}
+.skill-icon svg{width:24px;height:24px}
+.skill-tile h3{font-size:15px; line-height:1.25; color:var(--white); font-weight:600; margin-bottom:5px; letter-spacing:0}
+.skill-tile p{font-size:12.5px; line-height:1.58; color:var(--muted)}
+@media (max-width:900px){ .stack-panels{grid-template-columns:1fr} }
+@media (max-width:560px){
+  .skill-grid{grid-template-columns:1fr}
+  .skill-tile{min-height:0; flex-direction:row; align-items:flex-start}
+}
 
 /* ---------- FOOTER ---------- */
 .foot{margin-top:80px; padding-top:26px; border-top:1px solid var(--line);
