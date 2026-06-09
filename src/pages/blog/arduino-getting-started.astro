@@ -1,0 +1,327 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+
+export const prerender = true;
+
+const title = 'เริ่มต้น Arduino สำหรับมือใหม่: จากกล่องถึง Blink · Phum Blog';
+const checklist = [
+  'มี Arduino Board (Uno R3 / Nano / Mega) อย่างน้อย 1 ตัว',
+  'มีสาย USB ที่ตรงกับบอร์ด (USB-B สำหรับ Uno / Mini-USB สำหรับ Nano)',
+  'ติดตั้ง Arduino IDE บนคอมพิวเตอร์เรียบร้อย',
+  'เตรียม LED, ตัวต้านทาน 220Ω และ breadboard สำหรับทดลอง',
+  'มีความรู้พื้นฐานเรื่องวงจรไฟฟ้า (V = IR) เบื้องต้น',
+];
+---
+
+<Layout title={title}>
+  <Nav />
+  <main class="article-shell">
+    <div class="read-progress" aria-hidden="true"><span data-read-progress></span></div>
+
+    <article class="medium-article">
+      <header class="article-hero reveal">
+        <a class="back-link" href="/">← กลับหน้า Portfolio</a>
+        <p class="article-kicker">Beginner Guide</p>
+        <h1>เริ่มต้น Arduino สำหรับมือใหม่: จากกล่องถึง Blink</h1>
+        <p class="article-subtitle">
+          คู่มือแบบจับมือทำสำหรับคนที่เพิ่งเริ่มเล่น Arduino — ตั้งแต่แกะกล่อง ติดตั้งโปรแกรม
+          ต่อวงจรบน Breadboard จนถึงเขียนโค้ดกระพริบ LED ตัวแรกได้ภายใน 15 นาที
+        </p>
+        <div class="article-byline">
+          <img src="/assets/avatar.webp" alt="ณัฐเศรษฐ สีถาพล" width="96" height="96" decoding="async" />
+          <div>
+            <strong>ณัฐเศรษฐ สีถาพล</strong>
+            <span>อัปเดต 9 มิถุนายน 2026 · อ่านประมาณ 8 นาที</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="article-layout">
+        <aside class="article-toc reveal" aria-label="สารบัญ">
+          <p>On this page</p>
+          <a href="#overview">Arduino คืออะไร?</a>
+          <a href="#prepare">เตรียมอุปกรณ์</a>
+          <a href="#install">ติดตั้ง Arduino IDE</a>
+          <a href="#blink">โปรเจกต์แรก: Blink</a>
+          <a href="#external-led">ต่อ LED ภายนอก</a>
+          <a href="#next-steps">ก้าวต่อไป</a>
+        </aside>
+
+        <div class="article-content">
+          <section id="overview" class="reveal">
+            <p class="lead">
+              Arduino เป็นบอร์ดไมโครคอนโทรลเลอร์แบบ open-source ที่ออกแบบมาให้เริ่มต้นง่าย
+              แม้จะไม่เคยเขียนโค้ดหรือต่อวงจรมาก่อนก็เรียนรู้ได้เร็ว เพราะภาษาที่ใช้คล้าย C/C++
+              ที่ถูกทำให้ง่ายขึ้น และมี community ขนาดใหญ่คอยช่วยเหลือ
+            </p>
+            <p>
+              บทความนี้จะพาเริ่มจากศูนย์จริง ๆ ตั้งแต่ทำความรู้จักบอร์ด ติดตั้ง IDE
+              แล้วก็เขียนโปรแกรมกระพริบ LED ตัวแรก ซึ่งเป็น "Hello World" ของโลก Embedded
+              ถ้าทำตรงนี้ได้แล้ว จะต่อยอดไปเซ็นเซอร์ มอเตอร์ หรือ IoT ก็ไม่ยากเลย
+            </p>
+          </section>
+
+          <section class="deploy-snapshot reveal" aria-label="ข้อมูลบอร์ดแนะนำ">
+            <div>
+              <span>Board แนะนำ</span>
+              <strong>Arduino Uno R3</strong>
+            </div>
+            <div>
+              <span>ภาษาที่ใช้</span>
+              <strong>C / C++ (Arduino)</strong>
+            </div>
+            <div>
+              <span>เวลาที่ใช้</span>
+              <strong>~15 นาที</strong>
+            </div>
+          </section>
+
+          <section id="prepare" class="reveal">
+            <h2>1. เตรียมอุปกรณ์ก่อนเริ่ม</h2>
+            <p>
+              ก่อนลงมือทำ เช็คก่อนว่ามีอุปกรณ์พร้อมหรือยัง ถ้าซื้อเป็น starter kit มักจะมีครบอยู่แล้ว
+              แต่ถ้าซื้อแยก ให้เตรียมตามรายการด้านล่าง
+            </p>
+
+            <div class="checklist" data-checklist>
+              {checklist.map((item) => (
+                <label>
+                  <input type="checkbox" />
+                  <span>{item}</span>
+                </label>
+              ))}
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>อุปกรณ์</th>
+                  <th>ราคาโดยประมาณ</th>
+                  <th>หมายเหตุ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Arduino Uno R3 (แท้/Clone)</td>
+                  <td>150–650 บาท</td>
+                  <td>Clone ใช้ได้เหมือนกัน แค่ต้องลง driver CH340</td>
+                </tr>
+                <tr>
+                  <td>สาย USB-B</td>
+                  <td>30–80 บาท</td>
+                  <td>สำหรับต่อ Uno กับคอมพิวเตอร์</td>
+                </tr>
+                <tr>
+                  <td>Breadboard</td>
+                  <td>35–80 บาท</td>
+                  <td>ขนาด 830 จุด (full-size) แนะนำสำหรับมือใหม่</td>
+                </tr>
+                <tr>
+                  <td>LED + ตัวต้านทาน 220Ω</td>
+                  <td>5–15 บาท</td>
+                  <td>ตัวต้านทานป้องกัน LED ไหม้</td>
+                </tr>
+                <tr>
+                  <td>สายจัมเปอร์ M-M</td>
+                  <td>20–60 บาท</td>
+                  <td>ใช้เชื่อมต่อบน breadboard</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section id="install" class="reveal">
+            <h2>2. ติดตั้ง Arduino IDE</h2>
+            <p>
+              ดาวน์โหลด Arduino IDE จากเว็บ <a href="https://www.arduino.cc/en/software" target="_blank" rel="noreferrer" style="color:var(--accent);">arduino.cc</a>
+              เลือก version ที่ตรงกับ OS ของเรา (Windows / macOS / Linux) แล้วติดตั้งตามขั้นตอนปกติ
+            </p>
+
+            <div class="timeline">
+              <div><span>01</span><p>ดาวน์โหลด Arduino IDE 2.x จากเว็บทางการ</p></div>
+              <div><span>02</span><p>ติดตั้งและเปิดโปรแกรม → เลือก Board: <code>Arduino Uno</code></p></div>
+              <div><span>03</span><p>เสียบสาย USB เข้าบอร์ด → เลือก Port ที่ตรง (เช่น <code>COM3</code> หรือ <code>/dev/ttyACM0</code>)</p></div>
+              <div><span>04</span><p>ถ้าใช้บอร์ด Clone ที่มีชิป CH340 ต้องลง driver เพิ่ม (ดาวน์โหลดจาก wch-ic.com)</p></div>
+            </div>
+
+            <div class="callout">
+              <strong>ถ้า Port ไม่ขึ้น?</strong>
+              <p>
+                ลองเปลี่ยนสาย USB (สายบางเส้นเป็นสาย charge-only ไม่มี data)
+                หรือลองเสียบ port USB อื่น ถ้าใช้ Windows ให้เช็ค Device Manager ว่ามี driver ครบหรือไม่
+              </p>
+            </div>
+          </section>
+
+          <section id="blink" class="reveal">
+            <h2>3. โปรเจกต์แรก: Blink (LED บนบอร์ด)</h2>
+            <p>
+              เปิด Arduino IDE แล้วเข้าเมนู <strong>File → Examples → 01.Basics → Blink</strong>
+              จะได้โค้ดสำเร็จรูปที่กระพริบ LED ที่อยู่บนบอร์ด (ขา 13) เป็นจังหวะ
+              โค้ดนี้เป็นพื้นฐานที่จะทำให้เข้าใจโครงสร้างโปรแกรม Arduino ทั้งหมด
+            </p>
+
+            <div class="code-card">
+              <button type="button" data-copy="void setup() {\n  pinMode(LED_BUILTIN, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(LED_BUILTIN, HIGH);\n  delay(1000);\n  digitalWrite(LED_BUILTIN, LOW);\n  delay(1000);\n}">Copy</button>
+              <pre><code>void setup() &#123;
+  pinMode(LED_BUILTIN, OUTPUT);
+&#125;
+
+void loop() &#123;
+  digitalWrite(LED_BUILTIN, HIGH);   // เปิด LED
+  delay(1000);                       // รอ 1 วินาที
+  digitalWrite(LED_BUILTIN, LOW);    // ปิด LED
+  delay(1000);                       // รอ 1 วินาที
+&#125;</code></pre>
+            </div>
+
+            <p>
+              กดปุ่ม <strong>Upload</strong> (ลูกศรไปทางขวา) แล้วรอจน IDE แสดง "Done uploading"
+              เท่านี้ LED สีส้มบนบอร์ดจะกระพริบเป็นจังหวะ 1 วินาทีติด 1 วินาทีดับ
+            </p>
+
+            <h3>ทำความเข้าใจโครงสร้าง</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>ฟังก์ชัน</th>
+                  <th>หน้าที่</th>
+                  <th>ทำงานกี่ครั้ง</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>setup()</code></td>
+                  <td>ตั้งค่าเริ่มต้น เช่น กำหนดขาเป็น input / output</td>
+                  <td>1 ครั้ง (ตอนเปิดเครื่อง)</td>
+                </tr>
+                <tr>
+                  <td><code>loop()</code></td>
+                  <td>โค้ดที่ทำงานวนซ้ำตลอดเวลา</td>
+                  <td>วนไม่รู้จบ</td>
+                </tr>
+                <tr>
+                  <td><code>pinMode()</code></td>
+                  <td>กำหนดว่าขานั้นเป็น INPUT หรือ OUTPUT</td>
+                  <td>เรียกใน setup()</td>
+                </tr>
+                <tr>
+                  <td><code>digitalWrite()</code></td>
+                  <td>สั่ง HIGH (5V) หรือ LOW (0V) ไปที่ขา digital</td>
+                  <td>เรียกได้เรื่อย ๆ</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section id="external-led" class="reveal">
+            <h2>4. ต่อ LED ภายนอกบน Breadboard</h2>
+            <p>
+              หลังจากกระพริบ LED บนบอร์ดได้แล้ว มาลองต่อ LED ภายนอกบน breadboard
+              เพื่อฝึกต่อวงจรจริง สิ่งที่ต้องทำคือต่อ LED ผ่านตัวต้านทาน 220Ω
+              จากขา digital ไปยัง GND ของบอร์ด
+            </p>
+
+            <div class="timeline">
+              <div><span>01</span><p>เสียบ LED ลง breadboard — <strong>ขายาว (anode/+)</strong> อยู่ฝั่งที่จะต่อกับ Arduino</p></div>
+              <div><span>02</span><p>ต่อตัวต้านทาน 220Ω จากขายาวของ LED ไปยังขา <code>D8</code> ของ Arduino</p></div>
+              <div><span>03</span><p>ต่อขาสั้นของ LED (cathode/−) ไปยังราง <code>GND</code> ของ breadboard</p></div>
+              <div><span>04</span><p>ต่อสายจัมเปอร์จาก GND ของ Arduino ไปยังราง GND ของ breadboard</p></div>
+            </div>
+
+            <div class="code-card">
+              <button type="button" data-copy="const int ledPin = 8;\n\nvoid setup() {\n  pinMode(ledPin, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(ledPin, HIGH);\n  delay(500);\n  digitalWrite(ledPin, LOW);\n  delay(500);\n}">Copy</button>
+              <pre><code>const int ledPin = 8;       // ใช้ขา D8
+
+void setup() &#123;
+  pinMode(ledPin, OUTPUT);
+&#125;
+
+void loop() &#123;
+  digitalWrite(ledPin, HIGH);
+  delay(500);                  // กระพริบเร็วขึ้น 0.5 วินาที
+  digitalWrite(ledPin, LOW);
+  delay(500);
+&#125;</code></pre>
+            </div>
+
+            <div class="callout">
+              <strong>ทำไมต้องมีตัวต้านทาน?</strong>
+              <p>
+                LED ทนกระแสได้ประมาณ 20mA แต่ขา Arduino จ่ายกระแสสูงสุดถึง 40mA
+                ถ้าไม่มีตัวต้านทาน กระแสจะไหลเกินจน LED ไหม้ ใช้สูตร R = (5V − 2V) / 20mA = 150Ω
+                แต่เราใช้ 220Ω เพื่อความปลอดภัย
+              </p>
+            </div>
+          </section>
+
+          <section id="next-steps" class="reveal">
+            <h2>5. ก้าวต่อไปหลังจาก Blink</h2>
+            <p>
+              เมื่อกระพริบ LED ได้แล้ว แสดงว่าเราเข้าใจพื้นฐานของ Arduino ทั้ง IDE, การต่อวงจร
+              และการเขียนโค้ดแล้ว ขั้นตอนต่อไปที่แนะนำคือ
+            </p>
+
+            <div class="timeline">
+              <div><span>01</span><p><strong>อ่าน Analog Input</strong> — ใช้ <code>analogRead()</code> กับ Potentiometer (ตัวต้านทานปรับค่าได้) เพื่อควบคุมความสว่าง LED</p></div>
+              <div><span>02</span><p><strong>ใช้เซ็นเซอร์</strong> — ต่อเซ็นเซอร์อุณหภูมิ (DHT11) หรือ ultrasonic (HC-SR04) แล้วส่งค่าผ่าน Serial Monitor</p></div>
+              <div><span>03</span><p><strong>ควบคุมมอเตอร์</strong> — ใช้ Servo หรือ DC Motor ผ่าน Motor Driver (L298N) เพื่อสร้างหุ่นยนต์ตัวแรก</p></div>
+              <div><span>04</span><p><strong>เชื่อมต่อ IoT</strong> — ย้ายไปใช้ ESP32 แล้วส่งข้อมูลเซ็นเซอร์ขึ้น Internet ผ่าน WiFi / MQTT</p></div>
+            </div>
+          </section>
+
+          <section class="source-note reveal">
+            <h2>แหล่งอ้างอิงหลัก</h2>
+            <p>
+              บทความนี้อิงจากเอกสารทางการของ Arduino และ Arduino IDE 2.x documentation
+              รวมถึง Getting Started Guide จาก Arduino Foundation
+            </p>
+            <div class="source-links">
+              <a href="https://www.arduino.cc/en/Guide" target="_blank" rel="noreferrer">Arduino Getting Started Guide</a>
+              <a href="https://docs.arduino.cc/built-in-examples/basics/Blink/" target="_blank" rel="noreferrer">Blink Example</a>
+              <a href="https://docs.arduino.cc/learn/electronics/lcd-displays/" target="_blank" rel="noreferrer">Arduino Tutorials</a>
+              <a href="https://www.arduino.cc/reference/en/" target="_blank" rel="noreferrer">Arduino Language Reference</a>
+            </div>
+          </section>
+        </div>
+      </div>
+    </article>
+
+    <Footer />
+  </main>
+</Layout>
+
+<script>
+  (() => {
+    const bar = document.querySelector<HTMLElement>('[data-read-progress]');
+    const article = document.querySelector<HTMLElement>('.medium-article');
+    if (!bar || !article) return;
+
+    const setProgress = () => {
+      const rect = article.getBoundingClientRect();
+      const total = rect.height - innerHeight;
+      const read = Math.min(Math.max(-rect.top, 0), Math.max(total, 1));
+      bar.style.transform = `scaleX(${read / Math.max(total, 1)})`;
+    };
+    setProgress();
+    addEventListener('scroll', setProgress, { passive: true });
+    addEventListener('resize', setProgress);
+
+    document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const value = button.dataset.copy || '';
+        try {
+          await navigator.clipboard.writeText(value);
+          button.textContent = 'Copied';
+          window.setTimeout(() => {
+            button.textContent = 'Copy';
+          }, 1400);
+        } catch {
+          button.textContent = 'Select';
+        }
+      });
+    });
+  })();
+</script>

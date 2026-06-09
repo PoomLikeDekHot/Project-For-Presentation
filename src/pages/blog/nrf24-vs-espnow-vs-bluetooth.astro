@@ -1,0 +1,360 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+
+export const prerender = true;
+
+const title = 'เปรียบเทียบ NRF24 vs ESP-NOW vs Bluetooth: เลือก Wireless ตัวไหนดี? · Phum Blog';
+---
+
+<Layout title={title}>
+  <Nav />
+  <main class="article-shell">
+    <div class="read-progress" aria-hidden="true"><span data-read-progress></span></div>
+
+    <article class="medium-article">
+      <header class="article-hero reveal">
+        <a class="back-link" href="/">← กลับหน้า Portfolio</a>
+        <p class="article-kicker">Wireless Comparison</p>
+        <h1>เปรียบเทียบ NRF24 vs ESP-NOW vs Bluetooth: เลือก Wireless ตัวไหนดี?</h1>
+        <p class="article-subtitle">
+          สรุปข้อดี-ข้อเสียของ 3 เทคโนโลยีไร้สายยอดนิยมสำหรับโปรเจกต์ IoT / Embedded
+          พร้อมตารางเปรียบเทียบ ตัวอย่างการใช้งาน และคำแนะนำว่าควรเลือกตัวไหนตามสถานการณ์
+        </p>
+        <div class="article-byline">
+          <img src="/assets/avatar.webp" alt="ณัฐเศรษฐ สีถาพล" width="96" height="96" decoding="async" />
+          <div>
+            <strong>ณัฐเศรษฐ สีถาพล</strong>
+            <span>อัปเดต 9 มิถุนายน 2026 · อ่านประมาณ 9 นาที</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="article-layout">
+        <aside class="article-toc reveal" aria-label="สารบัญ">
+          <p>On this page</p>
+          <a href="#overview">ทำไมต้องเปรียบเทียบ?</a>
+          <a href="#nrf24">NRF24L01+</a>
+          <a href="#espnow">ESP-NOW</a>
+          <a href="#bluetooth">Bluetooth (BLE)</a>
+          <a href="#compare">ตารางเปรียบเทียบ</a>
+          <a href="#choose">เลือกอย่างไร?</a>
+        </aside>
+
+        <div class="article-content">
+          <section id="overview" class="reveal">
+            <p class="lead">
+              เวลาทำโปรเจกต์ IoT หรือ Embedded ที่ต้องส่งข้อมูลระหว่างอุปกรณ์แบบไร้สาย
+              คำถามแรกที่เจอเสมอคือ "ใช้ Wireless ตัวไหนดี?" บทความนี้จะเปรียบเทียบ 3 ตัวเลือกยอดนิยม
+              ที่ใช้บ่อยในโปรเจกต์ระดับนักศึกษาและ maker
+            </p>
+            <p>
+              ทั้ง 3 ตัวนี้ผมเคยใช้งานจริงในโปรเจกต์ต่าง ๆ โดยเฉพาะ NRF24 ที่ใช้ในโปรเจกต์
+              <strong>Smart Pot Monitor</strong> เพราะต้องการส่งข้อมูลเซ็นเซอร์แบบ point-to-point
+              ระหว่าง Arduino สองตัว บทความนี้จะสรุปสิ่งที่เรียนรู้มาให้ตัดสินใจง่ายขึ้น
+            </p>
+          </section>
+
+          <section class="deploy-snapshot reveal" aria-label="ภาพรวม 3 เทคโนโลยี">
+            <div>
+              <span>NRF24L01+</span>
+              <strong>2.4 GHz · SPI</strong>
+            </div>
+            <div>
+              <span>ESP-NOW</span>
+              <strong>2.4 GHz · WiFi chip</strong>
+            </div>
+            <div>
+              <span>Bluetooth BLE</span>
+              <strong>2.4 GHz · BLE 4.0+</strong>
+            </div>
+          </section>
+
+          <section id="nrf24" class="reveal">
+            <h2>1. NRF24L01+ — ถูก เร็ว แต่ต้องต่อสายเอง</h2>
+            <p>
+              NRF24L01+ เป็นโมดูลรับ-ส่งข้อมูลไร้สายที่ความถี่ 2.4GHz ผ่าน SPI
+              ราคาถูกมาก (ตัวละ 25–40 บาท) ใช้ได้กับ Arduino ทุกรุ่น
+              จุดเด่นคือส่งข้อมูลเร็ว latency ต่ำ เหมาะกับการส่ง sensor data แบบ real-time
+            </p>
+
+            <h3>ข้อดี</h3>
+            <div class="timeline">
+              <div><span>✓</span><p><strong>ราคาถูกมาก</strong> — ตัวละ 25–40 บาท ซื้อคู่ก็ไม่ถึงร้อย</p></div>
+              <div><span>✓</span><p><strong>ใช้กับ Arduino ได้ทุกรุ่น</strong> — ต่อ SPI แล้วใช้ library RF24 ที่เสถียรมาก</p></div>
+              <div><span>✓</span><p><strong>กินไฟต่ำ</strong> — ทำงานที่ 1.9–3.6V กินกระแสต่ำกว่า WiFi มาก</p></div>
+              <div><span>✓</span><p><strong>รองรับหลาย pipe</strong> — ส่งข้อมูลแบบ multicast ได้สูงสุด 6 ช่อง</p></div>
+            </div>
+
+            <h3>ข้อเสีย</h3>
+            <div class="timeline">
+              <div><span>✗</span><p><strong>ต้องต่อสาย SPI</strong> — ใช้สาย 7 เส้น ค่อนข้างเยอะบน breadboard</p></div>
+              <div><span>✗</span><p><strong>ระยะจำกัด</strong> — รุ่นธรรมดาส่งได้ ~100m (กลางแจ้ง) แต่ในอาคารอาจเหลือ 20–30m</p></div>
+              <div><span>✗</span><p><strong>ไม่มี Internet</strong> — ส่งข้อมูลแบบ peer-to-peer เท่านั้น ไม่ขึ้น cloud ได้ตรง ๆ</p></div>
+            </div>
+
+            <div class="code-card">
+              <button type="button" data-copy={`#include <SPI.h>\n#include <nRF24L01.h>\n#include <RF24.h>\n\nRF24 radio(9, 10);\nconst byte addr[6] = "00001";\n\nvoid setup() {\n  radio.begin();\n  radio.openWritingPipe(addr);\n  radio.setPALevel(RF24_PA_MIN);\n  radio.stopListening();\n}\n\nvoid loop() {\n  const char text[] = "Hello";\n  radio.write(&text, sizeof(text));\n  delay(1000);\n}`}>Copy</button>
+              <pre><code>#include &lt;SPI.h&gt;
+#include &lt;nRF24L01.h&gt;
+#include &lt;RF24.h&gt;
+
+RF24 radio(9, 10);             // CE, CSN
+const byte addr[6] = "00001";
+
+void setup() &#123;
+  radio.begin();
+  radio.openWritingPipe(addr);
+  radio.setPALevel(RF24_PA_MIN);
+  radio.stopListening();
+&#125;
+
+void loop() &#123;
+  const char text[] = "Hello";
+  radio.write(&amp;text, sizeof(text));
+  delay(1000);
+&#125;</code></pre>
+            </div>
+          </section>
+
+          <section id="espnow" class="reveal">
+            <h2>2. ESP-NOW — ส่งเร็ว ไม่ต้องต่อ WiFi</h2>
+            <p>
+              ESP-NOW เป็นโปรโตคอลที่ Espressif สร้างขึ้นสำหรับ ESP32 / ESP8266
+              ใช้ช่อง WiFi 2.4GHz ส่งข้อมูลแบบ peer-to-peer โดย<strong>ไม่ต้องเชื่อมต่อ WiFi router</strong>
+              จุดเด่นคือ setup ง่าย ไม่ต้องซื้อโมดูลเพิ่ม เพราะชิปมี WiFi ในตัวอยู่แล้ว
+            </p>
+
+            <h3>ข้อดี</h3>
+            <div class="timeline">
+              <div><span>✓</span><p><strong>ไม่ต้องซื้อโมดูลเพิ่ม</strong> — ESP32 มี WiFi ในตัว ใช้ ESP-NOW ได้เลย</p></div>
+              <div><span>✓</span><p><strong>Latency ต่ำมาก</strong> — ส่งข้อมูลได้ภายใน 1–3ms</p></div>
+              <div><span>✓</span><p><strong>รองรับ broadcast</strong> — ส่งข้อมูลไปหลายตัวพร้อมกันได้</p></div>
+              <div><span>✓</span><p><strong>ใช้คู่กับ WiFi ได้</strong> — ส่งข้อมูลผ่าน ESP-NOW พร้อมขึ้น cloud ผ่าน WiFi</p></div>
+            </div>
+
+            <h3>ข้อเสีย</h3>
+            <div class="timeline">
+              <div><span>✗</span><p><strong>ใช้ได้เฉพาะ ESP</strong> — Arduino Uno/Nano ใช้ไม่ได้ ต้องเป็น ESP32 หรือ ESP8266</p></div>
+              <div><span>✗</span><p><strong>ข้อมูลต่อ packet จำกัด</strong> — ส่งได้สูงสุด 250 bytes ต่อ packet</p></div>
+              <div><span>✗</span><p><strong>กินไฟมากกว่า NRF24</strong> — เพราะชิป WiFi ทำงานตลอด</p></div>
+            </div>
+
+            <div class="code-card">
+              <button type="button" data-copy={`#include <esp_now.h>\n#include <WiFi.h>\n\nuint8_t peerAddr[] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};\n\ntypedef struct {\n  float temperature;\n  float humidity;\n} SensorData;\n\nSensorData data;\n\nvoid setup() {\n  Serial.begin(115200);\n  WiFi.mode(WIFI_STA);\n  esp_now_init();\n}\n\nvoid loop() {\n  data.temperature = 28.5;\n  data.humidity = 65.0;\n  esp_now_send(peerAddr, (uint8_t*)&data, sizeof(data));\n  delay(2000);\n}`}>Copy</button>
+              <pre><code>#include &lt;esp_now.h&gt;
+#include &lt;WiFi.h&gt;
+
+uint8_t peerAddr[] = &#123;0xFF,0xFF,0xFF,0xFF,0xFF,0xFF&#125;;
+
+typedef struct &#123;
+  float temperature;
+  float humidity;
+&#125; SensorData;
+
+SensorData data;
+
+void setup() &#123;
+  Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
+  esp_now_init();
+  // ... register peer ...
+&#125;
+
+void loop() &#123;
+  data.temperature = 28.5;
+  data.humidity = 65.0;
+  esp_now_send(peerAddr, (uint8_t*)&amp;data, sizeof(data));
+  delay(2000);
+&#125;</code></pre>
+            </div>
+          </section>
+
+          <section id="bluetooth" class="reveal">
+            <h2>3. Bluetooth (BLE) — เชื่อมกับมือถือได้ง่าย</h2>
+            <p>
+              Bluetooth Low Energy (BLE 4.0+) เป็นเทคโนโลยีที่เหมาะสำหรับการเชื่อมต่ออุปกรณ์กับ
+              <strong>มือถือ / แท็บเล็ต</strong> โดยเฉพาะ เพราะ iOS / Android รองรับ BLE อยู่แล้ว
+              ถ้าโปรเจกต์ต้องมีแอปควบคุม BLE เป็นตัวเลือกที่ดีที่สุด
+            </p>
+
+            <h3>ข้อดี</h3>
+            <div class="timeline">
+              <div><span>✓</span><p><strong>เชื่อมมือถือได้โดยตรง</strong> — ไม่ต้องมี gateway หรือ server กลาง</p></div>
+              <div><span>✓</span><p><strong>กินไฟต่ำ</strong> — BLE ออกแบบมาเพื่อ low power โดยเฉพาะ</p></div>
+              <div><span>✓</span><p><strong>มาตรฐานสากล</strong> — ใช้ได้กับอุปกรณ์ทุกยี่ห้อที่รองรับ BLE</p></div>
+              <div><span>✓</span><p><strong>ESP32 มี BLE ในตัว</strong> — ไม่ต้องซื้อโมดูลเพิ่ม</p></div>
+            </div>
+
+            <h3>ข้อเสีย</h3>
+            <div class="timeline">
+              <div><span>✗</span><p><strong>ส่งข้อมูลช้ากว่า</strong> — BLE เน้นประหยัดไฟ bandwidth ต่ำกว่า ESP-NOW / NRF24</p></div>
+              <div><span>✗</span><p><strong>ระยะทางสั้น</strong> — ปกติ 10–30m ในอาคาร</p></div>
+              <div><span>✗</span><p><strong>ต้องพัฒนาแอป</strong> — ถ้าอยากควบคุมจากมือถือ ต้องทำแอป (Flutter / React Native) เพิ่ม</p></div>
+            </div>
+
+            <div class="callout">
+              <strong>BLE vs Bluetooth Classic</strong>
+              <p>
+                BLE (Bluetooth Low Energy) กับ Bluetooth Classic เป็นคนละตัว!
+                BLE เน้นกินไฟต่ำ ส่งข้อมูลชิ้นเล็ก ๆ เหมาะกับเซ็นเซอร์
+                ส่วน Bluetooth Classic (SPP) เน้นส่งข้อมูลต่อเนื่อง เช่น เสียง, ไฟล์
+                ESP32 รองรับทั้ง 2 แบบ แต่ Arduino Nano ต้องใช้โมดูล HC-05/HC-06 (Classic เท่านั้น)
+              </p>
+            </div>
+          </section>
+
+          <section id="compare" class="reveal">
+            <h2>4. ตารางเปรียบเทียบ</h2>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>คุณสมบัติ</th>
+                  <th>NRF24L01+</th>
+                  <th>ESP-NOW</th>
+                  <th>BLE 4.0+</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ความถี่</td>
+                  <td>2.4 GHz</td>
+                  <td>2.4 GHz</td>
+                  <td>2.4 GHz</td>
+                </tr>
+                <tr>
+                  <td>บอร์ดที่ใช้ได้</td>
+                  <td>Arduino ทุกรุ่น</td>
+                  <td>ESP32 / ESP8266</td>
+                  <td>ESP32 / Arduino + โมดูล</td>
+                </tr>
+                <tr>
+                  <td>ราคาโมดูล</td>
+                  <td>25–40฿</td>
+                  <td>ฟรี (ในตัวชิป)</td>
+                  <td>ฟรี (ESP32) / 60–120฿ (HM-10)</td>
+                </tr>
+                <tr>
+                  <td>ระยะ (indoor)</td>
+                  <td>20–30m</td>
+                  <td>30–50m</td>
+                  <td>10–30m</td>
+                </tr>
+                <tr>
+                  <td>ระยะ (outdoor)</td>
+                  <td>~100m</td>
+                  <td>~200m</td>
+                  <td>~50m</td>
+                </tr>
+                <tr>
+                  <td>ขนาด packet สูงสุด</td>
+                  <td>32 bytes</td>
+                  <td>250 bytes</td>
+                  <td>~512 bytes (MTU)</td>
+                </tr>
+                <tr>
+                  <td>Latency</td>
+                  <td>~1ms</td>
+                  <td>~1–3ms</td>
+                  <td>~7.5ms+</td>
+                </tr>
+                <tr>
+                  <td>เชื่อมมือถือ</td>
+                  <td>✗</td>
+                  <td>✗</td>
+                  <td>✓</td>
+                </tr>
+                <tr>
+                  <td>ความยากในการใช้</td>
+                  <td>ปานกลาง</td>
+                  <td>ง่าย</td>
+                  <td>ปานกลาง–ยาก</td>
+                </tr>
+                <tr>
+                  <td>กินไฟ (active)</td>
+                  <td>~12mA</td>
+                  <td>~120mA</td>
+                  <td>~15mA (BLE)</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section id="choose" class="reveal">
+            <h2>5. สรุป: เลือกตัวไหนดี?</h2>
+            <p>
+              ไม่มีตัวไหน "ดีที่สุด" ในทุกกรณี — ขึ้นอยู่กับโจทย์ของโปรเจกต์ ลองดูตามสถานการณ์
+            </p>
+
+            <div class="timeline">
+              <div><span>🌱</span><p><strong>ใช้ Arduino Uno/Nano + ส่ง sensor data</strong> → เลือก <code>NRF24L01+</code> ถูก เร็ว เสถียร (ผมใช้ในโปรเจกต์ Smart Pot Monitor)</p></div>
+              <div><span>⚡</span><p><strong>ใช้ ESP32 + ส่งข้อมูลระหว่างบอร์ด</strong> → เลือก <code>ESP-NOW</code> ไม่ต้องซื้อโมดูลเพิ่ม setup ง่ายที่สุด</p></div>
+              <div><span>📱</span><p><strong>ต้องเชื่อมกับมือถือ / ทำแอปควบคุม</strong> → เลือก <code>BLE</code> เป็นทางเลือกเดียวที่เชื่อมมือถือโดยตรง</p></div>
+              <div><span>🌐</span><p><strong>ต้องส่งขึ้น Internet / Cloud</strong> → ใช้ <code>WiFi (MQTT)</code> แทน หรือใช้ ESP-NOW + WiFi คู่กัน (ESP32 ทำได้ทั้ง 2 อย่างพร้อมกัน)</p></div>
+            </div>
+
+            <div class="callout">
+              <strong>ประสบการณ์จากโปรเจกต์จริง</strong>
+              <p>
+                ในโปรเจกต์ Smart Pot Monitor ผมเลือก NRF24 เพราะใช้ Arduino Nano ซึ่งไม่มี WiFi ในตัว
+                แต่ถ้าเริ่มโปรเจกต์ใหม่ที่ใช้ ESP32 อยู่แล้ว ผมจะเลือก ESP-NOW ก่อนเสมอ
+                เพราะ setup ง่ายกว่า ไม่ต้องต่อสาย SPI 7 เส้น และส่ง packet ได้ใหญ่กว่า
+              </p>
+            </div>
+          </section>
+
+          <section class="source-note reveal">
+            <h2>แหล่งอ้างอิงหลัก</h2>
+            <p>
+              บทความนี้อิงจาก datasheet ของ Nordic Semiconductor (NRF24L01+), เอกสารทางการของ Espressif (ESP-NOW),
+              และ Bluetooth SIG specification รวมถึงประสบการณ์จากโปรเจกต์ Smart Pot Monitor
+            </p>
+            <div class="source-links">
+              <a href="https://www.nordicsemi.com/Products/nRF24-series" target="_blank" rel="noreferrer">NRF24L01+ Datasheet</a>
+              <a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/network/esp_now.html" target="_blank" rel="noreferrer">ESP-NOW Documentation</a>
+              <a href="https://www.bluetooth.com/specifications/specs/core-specification/" target="_blank" rel="noreferrer">Bluetooth Core Specification</a>
+              <a href="https://nrf24.github.io/RF24/" target="_blank" rel="noreferrer">RF24 Arduino Library</a>
+            </div>
+          </section>
+        </div>
+      </div>
+    </article>
+
+    <Footer />
+  </main>
+</Layout>
+
+<script>
+  (() => {
+    const bar = document.querySelector<HTMLElement>('[data-read-progress]');
+    const article = document.querySelector<HTMLElement>('.medium-article');
+    if (!bar || !article) return;
+
+    const setProgress = () => {
+      const rect = article.getBoundingClientRect();
+      const total = rect.height - innerHeight;
+      const read = Math.min(Math.max(-rect.top, 0), Math.max(total, 1));
+      bar.style.transform = `scaleX(${read / Math.max(total, 1)})`;
+    };
+    setProgress();
+    addEventListener('scroll', setProgress, { passive: true });
+    addEventListener('resize', setProgress);
+
+    document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const value = button.dataset.copy || '';
+        try {
+          await navigator.clipboard.writeText(value);
+          button.textContent = 'Copied';
+          window.setTimeout(() => {
+            button.textContent = 'Copy';
+          }, 1400);
+        } catch {
+          button.textContent = 'Select';
+        }
+      });
+    });
+  })();
+</script>
