@@ -12,6 +12,7 @@
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.10",
     "@astrojs/sitemap": "^3.7.3",
-    "astro": "^5.5.0"
+    "astro": "^5.5.0",
+    "mongodb": "^7.3.0"
   }
 }

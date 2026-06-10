@@ -10,8 +10,8 @@ const json = (data: unknown, status = 200) =>
     headers: { 'content-type': 'application/json; charset=utf-8' },
   });
 
-// GET /posts — คืนรายการโพสต์ทั้งหมด
-export const GET: APIRoute = () => json({ posts: listPosts() });
+// GET /posts — คืนรายการโพสต์ทั้งหมด (จาก MongoDB)
+export const GET: APIRoute = async () => json({ posts: await listPosts() });
 
 // POST /posts — สร้างโพสต์ใหม่จาก body JSON { title, content }
 export const POST: APIRoute = async ({ request }) => {
@@ -28,6 +28,6 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ error: 'ต้องมี title และ content และห้ามว่าง' }, 400);
   }
 
-  const post = createPost({ title, content });
+  const post = await createPost({ title, content });
   return json({ post }, 201);
 };

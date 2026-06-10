@@ -1,43 +1,70 @@
-// ── In-memory store สำหรับ blog posts (Task 1: ห้ามใช้ database) ──
-// ข้อมูลเก็บอยู่ใน memory ของ process เท่านั้น → รีสตาร์ทเซิร์ฟเวอร์แล้วข้อมูลหาย
-// (บน serverless/Cloudflare หลาย instance ข้อมูลอาจไม่ sync กัน — เหมาะกับรันทดสอบ local)
+// ── MongoDB store สำหรับ blog posts (Task 2: Persistence) ──
+// เปลี่ยนจาก in-memory array เป็น MongoDB collection
+// data persist ข้าม server restart ตามโจทย์ Task 2
+
+import { ObjectId } from 'mongodb';
+import { getDb } from './db';
 
 export interface Post {
   id: string;
   title: string;
   content: string;
-  createdAt: string; // ISO 8601 เช่น 2026-06-10T08:00:00.000Z
+  createdAt: string; // ISO 8601
 }
 
-// seed ตัวอย่างไว้ 1 อัน เพื่อให้ GET /posts มีข้อมูลให้ดูตั้งแต่แรก
-const posts: Post[] = [
-  {
-    id: '1',
-    title: 'โพสต์แรกของบล็อก',
-    content: 'ยินดีต้อนรับสู่ Blog API — นี่คือโพสต์ตัวอย่างที่ seed ไว้ใน memory',
-    createdAt: new Date().toISOString(),
-  },
-];
-let seq = posts.length; // ตัวนับ id ถัดไป
+/** ชื่อ collection ใน MongoDB */
+const COLLECTION = 'posts';
+
+/** helper: แปลง MongoDB document → Post (เปลี่ยน _id เป็น id) */
+function toPost(doc: any): Post {
+  return {
+    id: doc._id.toString(),
+    title: doc.title,
+    content: doc.content,
+    createdAt: doc.createdAt,
+  };
+}
 
 /** คืนรายการโพสต์ทั้งหมด (ใหม่สุดอยู่บน) */
-export function listPosts(): Post[] {
-  return [...posts].reverse();
+export async function listPosts(): Promise<Post[]> {
+  const db = await getDb();
+  const docs = await db
+    .collection(COLLECTION)
+    .find()
+    .sort({ createdAt: -1 })
+    .toArray();
+  return docs.map(toPost);
 }
 
-/** คืนโพสต์เดียวตาม id (ไม่เจอ = undefined) */
-export function getPost(id: string): Post | undefined {
-  return posts.find((p) => p.id === id);
+/** คืนโพสต์เดียวตาม id (ไม่เจอ = null) */
+export async function getPost(id: string): Promise<Post | null> {
+  if (!ObjectId.isValid(id)) return null;
+  const db = await getDb();
+  const doc = await db.collection(COLLECTION).findOne({ _id: new ObjectId(id) });
+  return doc ? toPost(doc) : null;
 }
 
-/** สร้างโพสต์ใหม่และเก็บลง store */
-export function createPost(input: { title: string; content: string }): Post {
-  const post: Post = {
-    id: String(++seq),
+/** สร้างโพสต์ใหม่และเก็บลง MongoDB */
+export async function createPost(input: { title: string; content: string }): Promise<Post> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+  const result = await db.collection(COLLECTION).insertOne({
     title: input.title,
     content: input.content,
-    createdAt: new Date().toISOString(),
+    createdAt: now,
+  });
+  return {
+    id: result.insertedId.toString(),
+    title: input.title,
+    content: input.content,
+    createdAt: now,
   };
-  posts.push(post);
-  return post;
+}
+
+/** ลบโพสต์ตาม id — คืน true ถ้าลบสำเร็จ, false ถ้าไม่เจอ */
+export async function deletePost(id: string): Promise<boolean> {
+  if (!ObjectId.isValid(id)) return false;
+  const db = await getDb();
+  const result = await db.collection(COLLECTION).deleteOne({ _id: new ObjectId(id) });
+  return result.deletedCount === 1;
 }
