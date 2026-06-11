@@ -1,6 +1,6 @@
-# Task 1 & 2 — Blog API (MongoDB Persistence)
+# Task 1, 2 & 3 — Blog API (MongoDB + Analytics)
 
-REST API สำหรับ blog เขียนเป็น **Astro server endpoints** — เก็บข้อมูลใน **MongoDB** (Task 2: data persist ข้าม server restart)
+REST API สำหรับ blog เขียนเป็น **Astro server endpoints** — เก็บข้อมูลใน **MongoDB** (Task 2: persist ข้าม restart) + ระบบนับวิว/จัดอันดับ (Task 3: Analytics)
 
 ## Resource: `posts`
 
@@ -12,15 +12,18 @@ REST API สำหรับ blog เขียนเป็น **Astro server endp
 | `title`     | string | หัวข้อโพสต์                      |
 | `content`   | string | เนื้อหา                         |
 | `createdAt` | string | เวลาที่สร้าง (ISO 8601)         |
+| `views`     | number | จำนวนการเข้าดู *(Task 3)*       |
 
 ## Endpoints
 
-| Method | Path         | คำอธิบาย                  | Status |
-| ------ | ------------ | ------------------------- | ------ |
-| GET    | `/posts`     | รายการโพสต์ทั้งหมด        | 200    |
-| POST   | `/posts`     | สร้างโพสต์ใหม่            | 201    |
-| GET    | `/posts/:id` | โพสต์เดียวตาม id          | 200 / 404 |
-| DELETE | `/posts/:id` | ลบโพสต์ตาม id *(Task 2)*  | 200 / 404 |
+| Method | Path                   | คำอธิบาย                       | Status |
+| ------ | ---------------------- | ------------------------------ | ------ |
+| GET    | `/posts`               | รายการโพสต์ทั้งหมด             | 200    |
+| POST   | `/posts`               | สร้างโพสต์ใหม่                 | 201    |
+| GET    | `/posts/:id`           | โพสต์เดียวตาม id               | 200 / 404 |
+| DELETE | `/posts/:id`           | ลบโพสต์ตาม id *(Task 2)*       | 200 / 404 |
+| POST   | `/posts/:id/view`      | เพิ่มวิว +1 *(Task 3)*         | 200 / 404 |
+| GET    | `/analytics/top-posts` | top 3 โพสต์ยอดวิว *(Task 3)*   | 200    |
 
 POST body (JSON): `{ "title": "...", "content": "..." }`
 ถ้า `title` หรือ `content` ว่าง → `400`. ถ้า body ไม่ใช่ JSON → `400`.
@@ -96,6 +99,12 @@ curl -X DELETE http://localhost:4321/posts/<id>
 
 # 5) ยืนยันว่าลบแล้ว (ควรได้ 404)
 curl http://localhost:4321/posts/<id>
+
+# 6) เพิ่มวิว +1 ให้โพสต์ (Task 3) — คืนโพสต์พร้อม views ล่าสุด
+curl -X POST http://localhost:4321/posts/<id>/view
+
+# 7) ดู top 3 โพสต์ยอดวิว (Task 3)
+curl http://localhost:4321/analytics/top-posts
 ```
 
 ## สิ่งที่เปลี่ยนจาก Task 1 → Task 2
@@ -117,7 +126,9 @@ curl http://localhost:4321/posts/<id>
 ## ไฟล์ที่เกี่ยวข้อง
 
 - `src/lib/db.ts` — MongoDB connection (reuse client)
-- `src/lib/posts-store.ts` — CRUD functions (list, get, create, delete)
+- `src/lib/posts-store.ts` — CRUD + analytics (list, get, create, delete, incrementView, topPosts)
 - `src/pages/posts/index.ts` — `GET /posts`, `POST /posts`
 - `src/pages/posts/[id].ts` — `GET /posts/:id`, `DELETE /posts/:id`
+- `src/pages/posts/[id]/view.ts` — `POST /posts/:id/view` *(Task 3)*
+- `src/pages/analytics/top-posts.ts` — `GET /analytics/top-posts` *(Task 3)*
 - `.env.example` — ตัวอย่าง environment variables

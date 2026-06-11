@@ -10,6 +10,7 @@ export interface Post {
   title: string;
   content: string;
   createdAt: string; // ISO 8601
+  views: number; // Task 3: จำนวนการเข้าดู
 }
 
 /** ชื่อ collection ใน MongoDB */
@@ -22,6 +23,7 @@ function toPost(doc: any): Post {
     title: doc.title,
     content: doc.content,
     createdAt: doc.createdAt,
+    views: doc.views ?? 0, // โพสต์เก่าที่ยังไม่มี field views → นับเป็น 0
   };
 }
 
@@ -52,12 +54,14 @@ export async function createPost(input: { title: string; content: string }): Pro
     title: input.title,
     content: input.content,
     createdAt: now,
+    views: 0, // Task 3: เริ่มต้นที่ 0 view
   });
   return {
     id: result.insertedId.toString(),
     title: input.title,
     content: input.content,
     createdAt: now,
+    views: 0,
   };
 }
 
@@ -67,4 +71,30 @@ export async function deletePost(id: string): Promise<boolean> {
   const db = await getDb();
   const result = await db.collection(COLLECTION).deleteOne({ _id: new ObjectId(id) });
   return result.deletedCount === 1;
+}
+
+/** Task 3: เพิ่ม view +1 ให้โพสต์ — คืนโพสต์ที่อัปเดตแล้ว (ไม่เจอ = null) */
+export async function incrementView(id: string): Promise<Post | null> {
+  if (!ObjectId.isValid(id)) return null;
+  const db = await getDb();
+  const doc = await db
+    .collection(COLLECTION)
+    .findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      { $inc: { views: 1 } },
+      { returnDocument: 'after' }
+    );
+  return doc ? toPost(doc) : null;
+}
+
+/** Task 3: คืนโพสต์ยอดวิวสูงสุด N อันแรก (default 3) */
+export async function topPosts(limit = 3): Promise<Post[]> {
+  const db = await getDb();
+  const docs = await db
+    .collection(COLLECTION)
+    .find()
+    .sort({ views: -1, createdAt: -1 }) // วิวมากก่อน, เท่ากันเอาใหม่กว่าก่อน
+    .limit(limit)
+    .toArray();
+  return docs.map(toPost);
 }
