@@ -1,0 +1,9 @@
+node_modules
+dist
+.astro
+.git
+.env
+.env.production
+.dev.vars
+npm-debug.log*
+.DS_Store

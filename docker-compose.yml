@@ -1,0 +1,29 @@
+# ── Task 4: รันทั้งระบบ (API + MongoDB) ด้วยคำสั่งเดียว ──
+# รัน:  docker compose up --build
+
+services:
+  # ── ฐานข้อมูล MongoDB ──
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017" # map ออกมาเผื่ออยากต่อด้วย mongosh จากเครื่อง (จะเอาออกก็ได้)
+    volumes:
+      - mongo-data:/data/db # เก็บข้อมูลถาวร ไม่หายตอนลบ container
+
+  # ── Blog API (Astro Node server) ──
+  api:
+    build: . # build จาก Dockerfile ในโฟลเดอร์นี้
+    restart: unless-stopped
+    ports:
+      - "4321:4321"
+    environment:
+      # ชี้ไปที่ service "mongo" ภายในเครือข่าย compose (ไม่ใช่ localhost)
+      MONGODB_URI: mongodb://mongo:27017/blog
+      HOST: 0.0.0.0
+      PORT: "4321"
+    depends_on:
+      - mongo
+
+volumes:
+  mongo-data:

@@ -1,4 +1,4 @@
-# Task 1, 2 & 3 — Blog API (MongoDB + Analytics)
+# Task 1–4 — Blog API (MongoDB + Analytics + Docker)
 
 REST API สำหรับ blog เขียนเป็น **Astro server endpoints** — เก็บข้อมูลใน **MongoDB** (Task 2: persist ข้าม restart) + ระบบนับวิว/จัดอันดับ (Task 3: Analytics)
 
@@ -30,7 +30,34 @@ POST body (JSON): `{ "title": "...", "content": "..." }`
 
 ---
 
-## วิธี setup MongoDB
+## 🐳 รันด้วย Docker (Task 4) — แนะนำ
+
+วิธีนี้ง่ายสุด **ไม่ต้องลง Node / MongoDB เอง** ขอแค่มี [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+```bash
+# รันทั้งระบบ (API + MongoDB) ด้วยคำสั่งเดียว
+docker compose up --build
+```
+
+- API: http://localhost:4321
+- MongoDB: รันใน container ให้อัตโนมัติ (ข้อมูลเก็บถาวรใน volume `mongo-data`)
+
+```bash
+# หยุดระบบ
+docker compose down
+
+# หยุด + ลบข้อมูล MongoDB ทิ้งด้วย
+docker compose down -v
+```
+
+**เบื้องหลัง:** ตอน build ใน Docker จะตั้ง `BUILD_TARGET=node` ให้ Astro ใช้ Node adapter
+(รันเป็น server จริงใน container ได้) ส่วนการ deploy เว็บ portfolio ปกติยังใช้ Cloudflare adapter เหมือนเดิม
+
+ไฟล์ที่เกี่ยว: `Dockerfile`, `docker-compose.yml`, `.dockerignore`
+
+---
+
+## วิธี setup MongoDB (กรณีรันเองไม่ผ่าน Docker)
 
 ### ตัวเลือก A: MongoDB local (Docker)
 
@@ -131,4 +158,7 @@ curl http://localhost:4321/analytics/top-posts
 - `src/pages/posts/[id].ts` — `GET /posts/:id`, `DELETE /posts/:id`
 - `src/pages/posts/[id]/view.ts` — `POST /posts/:id/view` *(Task 3)*
 - `src/pages/analytics/top-posts.ts` — `GET /analytics/top-posts` *(Task 3)*
+- `Dockerfile` — build API เป็น Node server *(Task 4)*
+- `docker-compose.yml` — รัน API + MongoDB ด้วยคำสั่งเดียว *(Task 4)*
+- `.dockerignore` — ไฟล์ที่ไม่ต้องส่งเข้า Docker build *(Task 4)*
 - `.env.example` — ตัวอย่าง environment variables
