@@ -6,6 +6,7 @@
 
 ```
 portfolio-astro/
+├── .github/workflows/      GitHub Actions สำหรับ build/push Docker image
 ├── public/assets/          รูปและวิดีโอจริง (เดิมฝัง base64 ในไฟล์ HTML)
 ├── src/
 │   ├── data/projects.ts    ข้อมูลโปรเจกต์ทั้งหมด (การ์ด + modal)
@@ -27,8 +28,40 @@ npm run preview  # ดู build ที่ build เสร็จแล้ว
 
 ## Deploy
 
-เป็น static site ล้วน → deploy บน Vercel / Netlify / Cloudflare Pages ได้เลย
+หน้า portfolio ยัง deploy บน Vercel / Netlify / Cloudflare Pages ได้ตามปกติ
 (บน Vercel เลือก framework preset เป็น Astro แล้ว build command `npm run build`, output `dist`)
+
+ส่วน Blog API มี Docker workflow แยกไว้ใน [BLOG_API.md](BLOG_API.md)
+
+## Task 5: CI/CD + Image Publishing
+
+Objective: simulate production workflow ด้วย GitHub Actions โดย build Docker image จาก `Dockerfile` แล้ว push ไป Docker Hub
+
+Workflow file:
+
+- `.github/workflows/docker-image.yml`
+
+ต้องตั้งค่า GitHub Secrets ก่อนรัน:
+
+| Secret | ใช้ทำอะไร |
+| ------ | ---------- |
+| `DOCKERHUB_USERNAME` | Docker Hub username หรือ namespace |
+| `DOCKERHUB_TOKEN` | Docker Hub access token สำหรับ push image |
+
+Flow:
+
+1. push code เข้า branch `main` หรือกด run workflow เองจาก GitHub Actions
+2. GitHub Actions checkout code
+3. login Docker Hub ด้วย secrets
+4. build Docker image จาก `Dockerfile`
+5. push image ไป Docker Hub พร้อม tags `latest` และ `v1` (หรือ tag ที่กรอกตอน manual run)
+
+Docker image:
+
+- `https://hub.docker.com/r/<DOCKERHUB_USERNAME>/project-for-presentation`
+- ตัวอย่างถ้า Docker Hub username คือ `poomlikedekhot`: https://hub.docker.com/r/poomlikedekhot/project-for-presentation
+
+ไม่มี username/token ถูก hardcode ใน workflow
 
 ## แก้เนื้อหา
 

@@ -1,6 +1,6 @@
-# Task 1–4 — Blog API (MongoDB + Analytics + Docker)
+# Task 1–5 — Blog API (MongoDB + Analytics + Docker + CI/CD)
 
-REST API สำหรับ blog เขียนเป็น **Astro server endpoints** — เก็บข้อมูลใน **MongoDB** (Task 2: persist ข้าม restart) + ระบบนับวิว/จัดอันดับ (Task 3: Analytics)
+REST API สำหรับ blog เขียนเป็น **Astro server endpoints** — เก็บข้อมูลใน **MongoDB** (Task 2: persist ข้าม restart) + ระบบนับวิว/จัดอันดับ (Task 3: Analytics) + Docker image publishing ด้วย GitHub Actions (Task 5)
 
 ## Resource: `posts`
 
@@ -54,6 +54,47 @@ docker compose down -v
 (รันเป็น server จริงใน container ได้) ส่วนการ deploy เว็บ portfolio ปกติยังใช้ Cloudflare adapter เหมือนเดิม
 
 ไฟล์ที่เกี่ยว: `Dockerfile`, `docker-compose.yml`, `.dockerignore`
+
+---
+
+## Task 5: CI/CD + Image Publishing
+
+Objective: simulate production workflow ด้วย GitHub Actions โดย build Docker image จากโค้ดใน repo แล้ว push ไป Docker Hub
+
+Workflow file:
+
+- `.github/workflows/docker-image.yml`
+
+### GitHub Secrets ที่ต้องตั้ง
+
+ไปที่ GitHub repo → **Settings** → **Secrets and variables** → **Actions** แล้วเพิ่ม:
+
+| Secret | คำอธิบาย |
+| ------ | -------- |
+| `DOCKERHUB_USERNAME` | Docker Hub username หรือ namespace |
+| `DOCKERHUB_TOKEN` | Docker Hub access token สำหรับ push image |
+
+Constraints:
+
+- ห้าม hardcode username/token ใน workflow
+- workflow ใช้ `${{ secrets.DOCKERHUB_USERNAME }}` และ `${{ secrets.DOCKERHUB_TOKEN }}`
+- image มี tags `latest` และ `v1` เป็นค่า default
+- ถ้ากด manual run สามารถเปลี่ยน tag จาก `v1` เป็น tag อื่นได้ เช่น `v2`
+
+### Flow
+
+1. push code เข้า branch `main` หรือกด **Run workflow** เอง
+2. GitHub Actions checkout source code
+3. login Docker Hub ด้วย secrets
+4. build Docker image จาก `Dockerfile`
+5. push image ไป Docker Hub:
+   - `<DOCKERHUB_USERNAME>/project-for-presentation:latest`
+   - `<DOCKERHUB_USERNAME>/project-for-presentation:v1`
+
+Docker image link:
+
+- `https://hub.docker.com/r/<DOCKERHUB_USERNAME>/project-for-presentation`
+- ตัวอย่างถ้า Docker Hub username คือ `poomlikedekhot`: https://hub.docker.com/r/poomlikedekhot/project-for-presentation
 
 ---
 
@@ -161,4 +202,5 @@ curl http://localhost:4321/analytics/top-posts
 - `Dockerfile` — build API เป็น Node server *(Task 4)*
 - `docker-compose.yml` — รัน API + MongoDB ด้วยคำสั่งเดียว *(Task 4)*
 - `.dockerignore` — ไฟล์ที่ไม่ต้องส่งเข้า Docker build *(Task 4)*
+- `.github/workflows/docker-image.yml` — build/push Docker image ไป Docker Hub *(Task 5)*
 - `.env.example` — ตัวอย่าง environment variables
