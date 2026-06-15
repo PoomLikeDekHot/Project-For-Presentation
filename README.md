@@ -58,8 +58,8 @@ Flow:
 
 Docker image:
 
-- `https://hub.docker.com/r/<DOCKERHUB_USERNAME>/project-for-presentation`
-- ตัวอย่างถ้า Docker Hub username คือ `poomlikedekhot`: https://hub.docker.com/r/poomlikedekhot/project-for-presentation
+- https://hub.docker.com/r/phxpoom/project-for-presentation
+- tags: `latest`, `v1`
 
 ไม่มี username/token ถูก hardcode ใน workflow
 
